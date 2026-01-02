@@ -372,9 +372,16 @@ if (content.includes(bypassUseEffectOld)) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 if (content.includes('"Welcome to Claude Code"')) {
-    content = content.split('"Welcome to Claude Code"').join('"Bienvenue sur Claudy"');
+    content = content.split('"Welcome to Claude Code"').join('"Bienvenue sur Claudy v2.0.74"');
     patchCount++;
-    console.log('  [OK] Replaced onboarding "Welcome to Claude Code" → "Bienvenue sur Claudy"');
+    console.log('  [OK] Replaced onboarding "Welcome to Claude Code" → "Bienvenue sur Claudy v2.0.74"');
+}
+
+// Also replace any remaining "Welcome to Claude Code" patterns
+if (content.includes('Welcome to Claude Code')) {
+    content = content.split('Welcome to Claude Code').join('Bienvenue sur Claudy v2.0.74');
+    patchCount++;
+    console.log('  [OK] Replaced remaining "Welcome to Claude Code" → "Bienvenue sur Claudy v2.0.74"');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -495,6 +502,77 @@ if (content.includes(l17Marker)) {
     console.log('  [INFO] L17 alternative logo function not found (may be already patched)');
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 15: Remove "Bienvenue!" text from chat screen header
+// This removes the "Welcome!" text that appears above the logo in chat mode
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Remove French "Bienvenue!" with exclamation
+const bienvenuePattern1 = 'children:[p?"":U?"":U,';
+if (content.includes('children:["Bienvenue!",')) {
+    content = content.split('children:["Bienvenue!",').join('children:["",');
+    patchCount++;
+    console.log('  [OK] Removed "Bienvenue!" from chat header (French)');
+}
+
+// Also try pattern with just "Bienvenue" without exclamation
+if (content.includes('children:["Bienvenue"')) {
+    content = content.split('children:["Bienvenue"').join('children[""');
+    patchCount++;
+    console.log('  [OK] Removed "Bienvenue" from chat header (variant)');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 16: Remove "Claude Code" title from chat screen border
+// This removes the "Claude Code" title that appears in the top border frame
+// ═══════════════════════════════════════════════════════════════════════════
+
+// The border title pattern - typically something like: title:"Claude Code"
+if (content.includes('title:"Claude Code"')) {
+    content = content.split('title:"Claude Code"').join('title:"Claudy"');
+    patchCount++;
+    console.log('  [OK] Replaced border title "Claude Code" → "Claudy"');
+}
+
+// Also try with single quotes
+if (content.includes("title:'Claude Code'")) {
+    content = content.split("title:'Claude Code'").join("title:'Claudy'");
+    patchCount++;
+    console.log('  [OK] Replaced border title "Claude Code" → "Claudy" (single quotes)');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 17: Replace ASCII border title "Claude Code" with "Claudy"
+// This replaces the title in box-drawing borders like "╭─ Claude Code ──╮"
+// ═══════════════════════════════════════════════════════════════════════════
+
+// The pattern for the ASCII border title - look for it in title/content fields
+if (content.includes('"Claude Code"')) {
+    content = content.split('"Claude Code"').join('"Claudy"');
+    patchCount++;
+    console.log('  [OK] Replaced "Claude Code" → "Claudy" in ASCII borders');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 18: Replace any remaining "Claude" with "Claudy" in specific UI contexts
+// This catches any missed instances in headers, titles, and borders
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Look for "Claude" in header/title patterns but exclude "claude" command refs
+const headerPatterns = [
+    'label:"Claude"',          // Button labels
+    '"Claude"',                // Standalone string (not in contexts like "claude-code")
+    'name:"Claude"',           // Component names
+];
+
+for (const pattern of headerPatterns) {
+    if (content.includes(pattern)) {
+        content = content.split(pattern).join(pattern.replace('Claude', 'Claudy'));
+        patchCount++;
+        console.log(`  [OK] Replaced "${pattern}" → "${pattern.replace('Claude', 'Claudy')}"`);
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // WRITE PATCHED COPY (NOT modifying original!)
