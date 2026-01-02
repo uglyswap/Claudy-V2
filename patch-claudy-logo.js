@@ -427,6 +427,28 @@ if (content.includes('borderStyle:"round"')) {
     console.log('  [OK] Removed remaining borderStyle:"round" borders');
 }
 
+// Remove ALL borderStyle patterns - double, single, thick, etc.
+const borderStyles = ['double', 'single', 'thick', 'bold'];
+for (const style of borderStyles) {
+    const borderPattern = `borderStyle:"${style}"`;
+    if (content.includes(borderPattern)) {
+        content = content.split(borderPattern).join('borderStyle:void');
+        patchCount++;
+        console.log(`  [OK] Removed borderStyle:"${style}" borders`);
+    }
+}
+
+// Remove any borderColor patterns to ensure borders don't show up
+const borderColors = ['success', 'warning', 'error', 'permission', 'chromeYellow', 'ice_blue', 'text'];
+for (const color of borderColors) {
+    const colorPattern = `borderColor:"${color}"`;
+    if (content.includes(colorPattern)) {
+        content = content.split(colorPattern).join('');
+        patchCount++;
+        console.log(`  [OK] Removed borderColor:"${color}"`);
+    }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PATCH 13: Replace U17 alternative logo function (u2 version)
 // This function displays a simplified logo for certain terminals
@@ -543,15 +565,24 @@ if (content.includes("title:'Claude Code'")) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 17: Replace ASCII border title "Claude Code" with "Claudy"
-// This replaces the title in box-drawing borders like "╭─ Claude Code ──╮"
+// PATCH 17: Remove ASCII border title completely
+// This removes the title in box-drawing borders like "╭─ Claude Code ──╮"
+// We replace it with empty string or just spaces to show only the logo
 // ═══════════════════════════════════════════════════════════════════════════
 
-// The pattern for the ASCII border title - look for it in title/content fields
+// Replace "Claude Code" in border titles with empty string (removes title)
 if (content.includes('"Claude Code"')) {
-    content = content.split('"Claude Code"').join('"Claudy"');
+    content = content.split('"Claude Code"').join('""');
     patchCount++;
-    console.log('  [OK] Replaced "Claude Code" → "Claudy" in ASCII borders');
+    console.log('  [OK] Removed "Claude Code" from ASCII border titles');
+}
+
+// Also replace "Claudy" in title fields with empty to completely remove border title
+// Look for title:"Claudy" patterns in border/box components
+if (content.includes('title:"Claudy"')) {
+    content = content.split('title:"Claudy"').join('title:""');
+    patchCount++;
+    console.log('  [OK] Removed "Claudy" from border titles (empty title)');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
