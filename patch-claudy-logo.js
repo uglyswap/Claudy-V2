@@ -378,6 +378,49 @@ if (content.includes('"Welcome to Claude Code"')) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PATCH 12b: Remove the ASCII border/frame around the logo
+// This removes the box-drawing characters border from the welcome screen
+// ═══════════════════════════════════════════════════════════════════════════
+
+// The borderStyle:"round" creates the ASCII border. We replace it with void (no border)
+if (content.includes('borderStyle:"round",borderColor:"success"')) {
+    content = content.split('borderStyle:"round",borderColor:"success"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed borderStyle:"round" from success dialog');
+}
+
+if (content.includes('borderStyle:"round",borderColor:"warning"')) {
+    content = content.split('borderStyle:"round",borderColor:"warning"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed borderStyle:"round" from warning dialog');
+}
+
+if (content.includes('borderStyle:"round",borderColor:"error"')) {
+    content = content.split('borderStyle:"round",borderColor:"error"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed borderStyle:"round" from error dialog');
+}
+
+if (content.includes('borderStyle:"round",borderColor:"permission"')) {
+    content = content.split('borderStyle:"round",borderColor:"permission"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed borderStyle:"round" from permission dialog');
+}
+
+if (content.includes('borderStyle:"round",borderColor:"chromeYellow"')) {
+    content = content.split('borderStyle:"round",borderColor:"chromeYellow"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed borderStyle:"round" from chrome dialog');
+}
+
+// Also remove any remaining borderStyle:"round" without specific color
+if (content.includes('borderStyle:"round"')) {
+    content = content.split('borderStyle:"round"').join('borderStyle:void');
+    patchCount++;
+    console.log('  [OK] Removed remaining borderStyle:"round" borders');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PATCH 13: Replace U17 alternative logo function (u2 version)
 // This function displays a simplified logo for certain terminals
 // We replace the entire function body to show Claudy logo instead
