@@ -229,11 +229,35 @@ if (skillsOccurrences > 0) {
 // Covers: settings, skills discovery, agents, hooks, etc.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const configDirOccurrences = (content.match(/\"\.claude\"/g) || []).length;
-if (configDirOccurrences > 0) {
+let totalReplaced = 0;
+
+// Pass 1: Replace ".claude" (quoted paths)
+const quotedOccurrences = (content.match(/".claude"/g) || []).length;
+if (quotedOccurrences > 0) {
     content = content.split('".claude"').join('".claudy"');
+    totalReplaced += quotedOccurrences;
+    console.log(`  [OK] Replaced ${quotedOccurrences}x ".claude" → ".claudy" (quoted paths)`);
+}
+
+// Pass 2: Replace remaining patterns with regex
+const patternsToFix = [
+  [/\.claude\/settings\.json/g, '.claudy/settings.json'],
+  [/\.claude\/settings\.local\.json/g, '.claudy/settings.local.json'],
+  [/\.claude,CLAUDE\.md/g, '.claudy,CLAUDE.md'],
+  [/\.claude,skills/g, '.claudy,skills']
+];
+
+for (const [pattern, replacement] of patternsToFix) {
+  const matches = content.match(pattern);
+  if (matches) {
+    content = content.replace(pattern, replacement);
+    totalReplaced += matches.length;
+  }
+}
+
+if (totalReplaced > 0) {
     patchCount++;
-    console.log(`  [OK] Replaced ${configDirOccurrences}x ".claude" → ".claudy" (config paths)`);
+    console.log(`  [SUMMARY] Total .claude → .claudy replacements: ${totalReplaced}`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
