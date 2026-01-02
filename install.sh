@@ -134,6 +134,13 @@ curl -fsSL "$LOGO_SCRIPT_URL" -o "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 chmod +x "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 echo -e "${GREEN}[OK] Logo anime installe${NC}"
 
+# Download MCP sync script
+echo -e "${YELLOW}Installation du script de synchronisation MCP...${NC}"
+SYNC_MCP_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
+SYNC_MCP_PATH="$CLAUDY_BIN_DIR/sync-mcp.js"
+curl -fsSL "$SYNC_MCP_URL" -o "$SYNC_MCP_PATH" 2>/dev/null || true
+echo -e "${GREEN}[OK] Script sync-mcp.js installe${NC}"
+
 # ============================================
 # CREATE CLAUDY WRAPPER SCRIPT WITH API KEY VALIDATION
 # ============================================
@@ -297,6 +304,15 @@ if [ "$KEY_NEEDS_UPDATE" = true ]; then
     fi
 fi
 
+
+# ============================================
+# SYNC MCP SERVERS FROM settings.json TO .claudy.json
+# ============================================
+
+SYNC_MCP_SCRIPT="$CLAUDY_DIR/bin/sync-mcp.js"
+if [ -f "$SYNC_MCP_SCRIPT" ]; then
+    node "$SYNC_MCP_SCRIPT" 2>/dev/null || true
+fi
 # ============================================
 # EXPORT ENVIRONMENT VARIABLES
 # ============================================

@@ -192,6 +192,16 @@ try {
     Write-Host "[WARN] Impossible de telecharger claudy.ps1" -ForegroundColor Yellow
 }
 
+# Download sync-mcp.js
+$syncMcpUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
+$syncMcpPath = Join-Path $claudyBinDir "sync-mcp.js"
+try {
+    Invoke-WebRequest -Uri $syncMcpUrl -OutFile $syncMcpPath -UseBasicParsing
+    Write-Host "[OK] sync-mcp.js telecharge" -ForegroundColor Green
+} catch {
+    Write-Host "[WARN] Impossible de telecharger sync-mcp.js" -ForegroundColor Yellow
+}
+
 # Create batch file in ~/.claudy/bin/
 $claudyCmdPath = Join-Path $claudyBinDir "claudy.cmd"
 $claudyCmdContent = @"
