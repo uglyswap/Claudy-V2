@@ -224,44 +224,26 @@ if (skillsOccurrences > 0) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 7: Replace ".claude" config directory with ".claudy"
-// This ensures ALL config paths use ~/.claudy/ instead of ~/.claude/
-// Covers: settings, skills discovery, agents, hooks, etc.
-// ═══════════════════════════════════════════════════════════════════════════
-
+// PATCH 7: COMPREHENSIVE REPLACE - Replace ALL .claude with .claudy
+// This is CRITICAL for MCP servers to work correctly!
+// Previous partial replacement broke MCP functionality
+// COMPREHENSIVE PATCH: Replace ALL occurrences of .claude with .claudy
+// This is CRITICAL for MCP servers to work correctly!
+// Previous partial replacement broke MCP functionality
+let originalContent = content;
 let totalReplaced = 0;
 
-// Pass 1: Replace ".claude" (quoted paths)
-const quotedOccurrences = (content.match(/".claude"/g) || []).length;
-if (quotedOccurrences > 0) {
-    content = content.split('".claude"').join('".claudy"');
-    totalReplaced += quotedOccurrences;
-    console.log(`  [OK] Replaced ${quotedOccurrences}x ".claude" → ".claudy" (quoted paths)`);
-}
+// Use a simple regex replacement to catch ALL .claude patterns
+// This ensures the CLI uses ~/.claudy/ instead of ~/.claude/ for everything
+content = content.replace(/\.claude/g, '.claudy');
 
-// Pass 2: Replace remaining patterns with regex
-const patternsToFix = [
-  [/\.claude\/settings\.json/g, '.claudy/settings.json'],
-  [/\.claude\/settings\.local\.json/g, '.claudy/settings.local.json'],
-  [/\.claude,CLAUDE\.md/g, '.claudy,CLAUDE.md'],
-  [/\.claude,skills/g, '.claudy,skills']
-];
-
-for (const [pattern, replacement] of patternsToFix) {
-  const matches = content.match(pattern);
-  if (matches) {
-    content = content.replace(pattern, replacement);
-    totalReplaced += matches.length;
-  }
-}
+// Count the replacements
+totalReplaced = (content.match(/.claudy/g) || []).length;
 
 if (totalReplaced > 0) {
     patchCount++;
-    console.log(`  [SUMMARY] Total .claude → .claudy replacements: ${totalReplaced}`);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PATCH 8: Inject /cle-api and /cle as native slash commands
+    console.log(`  [OK] Replaced ALL ${totalReplaced}x .claude → .claudy (COMPREHENSIVE)`);
+}// PATCH 8: Inject /cle-api and /cle as native slash commands
 // These commands work WITHOUT the model - pure Node.js
 //
 // STRATEGY: Find the commands array MW9=W0(()=>[...,g89,m89,...])
