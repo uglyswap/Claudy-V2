@@ -120,7 +120,7 @@ $cliSourcePath = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code
 $cliClaudyPath = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli-claudy.js"
 
 # Download and run the patch script with the local path
-$patchScriptUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+$patchScriptUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
 $patchScriptPath = Join-Path $env:TEMP "patch-claudy-logo.js"
 
 try {

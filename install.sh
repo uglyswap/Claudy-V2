@@ -114,7 +114,7 @@ echo -e "${GREEN}[OK] Claude Code v${CLAUDE_CODE_VERSION} installe dans ~/.claud
 echo -e "${YELLOW}Application du branding Claudy...${NC}"
 
 # Download and run the patch script with local path
-PATCH_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+PATCH_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
 PATCH_SCRIPT_PATH="/tmp/patch-claudy-logo.js"
 
 if curl -fsSL "$PATCH_SCRIPT_URL" -o "$PATCH_SCRIPT_PATH" 2>/dev/null; then
@@ -359,7 +359,7 @@ CLAUDY_EXE="$CLAUDY_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli-claudy.js
 if [ ! -f "$CLAUDY_EXE" ]; then
     echo -e "\033[1;33m[AUTO-REPAIR] cli-claudy.js manquant, re-creation en cours...\033[0m"
     
-    PATCH_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+    PATCH_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
     PATCH_PATH="/tmp/patch-claudy-logo.js"
     
     if curl -fsSL "$PATCH_URL" -o "$PATCH_PATH" 2>/dev/null; then
