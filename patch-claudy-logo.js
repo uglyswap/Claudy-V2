@@ -605,6 +605,107 @@ for (const pattern of headerPatterns) {
     }
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 19: Replace "Claude" with "Claudy" in Security notes section
+// This replaces "Claude can make mistakes" with "Claudy can make mistakes"
+// ═══════════════════════════════════════════════════════════════════════════
+
+if (content.includes('"Claude can make mistakes"')) {
+    content = content.split('"Claude can make mistakes"').join('"Claudy can make mistakes"');
+    patchCount++;
+    console.log('  [OK] Replaced "Claude can make mistakes" → "Claudy can make mistakes"');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 20: Remove the URL from Security notes - keep only first sentence
+// The pattern removes the URL link while keeping "Claudy can make mistakes"
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Remove the "For more details see:" section entirely
+const securityUrlPattern1 = ',W8.default.createElement(IW,null),W8.default.createElement(X9,{url:"https://code.claude.com/docs/en/security"}))))';
+if (content.includes(securityUrlPattern1)) {
+    content = content.split(securityUrlPattern1).join(')))');
+    patchCount++;
+    console.log('  [OK] Removed security URL from Security notes (pattern 1)');
+}
+
+// Alternative pattern for the URL removal
+const securityUrlPattern2 = ',W8.default.createElement(IW,null),W8.default.createElement(X9,{url:"https://code.claude.com/docs/en/security"})';
+if (content.includes(securityUrlPattern2)) {
+    content = content.split(securityUrlPattern2).join('');
+    patchCount++;
+    console.log('  [OK] Removed security URL from Security notes (pattern 2)');
+}
+
+// Also try to remove the "For more details see:" text
+if (content.includes('For more details see:"')) {
+    content = content.split('For more details see:"').join('"');
+    patchCount++;
+    console.log('  [OK] Removed "For more details see:" text');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 21: Remove "API Usage Billing" from status line
+// Replace "API Usage Billing" with empty string to hide it
+// ═══════════════════════════════════════════════════════════════════════════
+
+if (content.includes('"API Usage Billing"')) {
+    content = content.split('"API Usage Billing"').join('""');
+    patchCount++;
+    console.log('  [OK] Removed "API Usage Billing" text');
+}
+
+// Also remove the billingType:Z display entirely by replacing the billing text
+const billingPattern = 'billingType:Z,agentName:Y';
+if (content.includes(billingPattern)) {
+    content = content.split(billingPattern).join('billingType:"",agentName:Y');
+    patchCount++;
+    console.log('  [OK] Hidden billing type display');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 22: Remove "Bienvenue!" text from compact mode header
+// This removes the welcome text that appears in the compact mode border box
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Pattern for "Bienvenue!" in children array
+const bienvenueCompactPattern1 = 'children:[TK1(G),';
+if (content.includes(bienvenueCompactPattern1) && !content.includes('children:["",')) {
+    content = content.split(bienvenueCompactPattern1).join('children:["",');
+    patchCount++;
+    console.log('  [OK] Removed "Bienvenue!" from compact mode header');
+}
+
+// Alternative pattern - replace the TK1 function call with empty string
+const bienvenueCompactPattern2 = '_A=TK1(G);if(_A.length>Y-4)_A=TK1(null)';
+if (content.includes(bienvenueCompactPattern2)) {
+    content = content.split(bienvenueCompactPattern2).join('_A="";if(_A.length>Y-4)_A=""');
+    patchCount++;
+    console.log('  [OK] Disabled welcome message in compact mode (variant)');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 23: Remove border frame from compact mode welcome screen
+// This removes the borderStyle:"round" and borderText from the compact mode box
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Remove the border configuration from compact mode
+const compactBorderPattern = ',borderStyle:"round",borderColor:"claude",borderText:{content:g,position:"top",align:"start",offset:1}';
+if (content.includes(compactBorderPattern)) {
+    content = content.split(compactBorderPattern).join('');
+    patchCount++;
+    console.log('  [OK] Removed border frame from compact mode welcome box');
+}
+
+// Also remove the borderText variable definition if it's only used for the border
+const borderTextVarPattern = ',g=sQ("claude",S)(" Claude Code ")';
+if (content.includes(borderTextVarPattern)) {
+    content = content.split(borderTextVarPattern).join('');
+    patchCount++;
+    console.log('  [OK] Removed borderText variable (no longer needed)');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // WRITE PATCHED COPY (NOT modifying original!)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -617,3 +718,6 @@ console.log('[INFO] Original cli.js is UNCHANGED - "claude" command works normal
 console.log('[INFO] Claudy wrapper should use cli-claudy.js');
 console.log('[INFO] All config now uses ~/.claudy/ instead of ~/.claude/');
 console.log('[INFO] /cle-api command available - type / to see it in autocomplete');
+console.log('[INFO] Security notes: Claude → Claudy, URL removed');
+console.log('[INFO] "Bienvenue!" and border frame removed from compact mode');
+console.log('[INFO] "API Usage Billing" removed from status line');
