@@ -706,6 +706,52 @@ if (content.includes(borderTextVarPattern)) {
     console.log('  [OK] Removed borderText variable (no longer needed)');
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 24: SKIP WELCOME/ONBOARDING SCREEN - Go directly to chat
+// This forces the app to skip the welcome screen with Security Notes
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Pattern 1: Force hasCompletedProjectOnboarding to true globally
+const onboardingFlagPattern = 'hasCompletedProjectOnboarding:!1';
+if (content.includes(onboardingFlagPattern)) {
+    content = content.split(onboardingFlagPattern).join('hasCompletedProjectOnboarding:!0');
+    patchCount++;
+    console.log('  [OK] Forced onboarding completion to true (pattern 1)');
+}
+
+// Pattern 2: Force projectOnboardingSeenCount to a high number
+const onboardingCountPattern = 'projectOnboardingSeenCount:0';
+if (content.includes(onboardingCountPattern)) {
+    content = content.split(onboardingCountPattern).join('projectOnboardingSeenCount:999');
+    patchCount++;
+    console.log('  [OK] Set onboarding seen count to 999 (skip welcome screen)');
+}
+
+// Pattern 3: Skip showWelcomeScreen function - always return false
+const showWelcomePattern = 'showWelcomeScreen(){';
+if (content.includes(showWelcomePattern)) {
+    content = content.split(showWelcomePattern).join('showWelcomeScreen(){return!1,');
+    patchCount++;
+    console.log('  [OK] Modified showWelcomeScreen to always return false');
+}
+
+// Pattern 4: Force shouldShowOnboarding to false
+const shouldShowOnboardingPattern = 'shouldShowOnboarding:!0';
+if (content.includes(shouldShowOnboardingPattern)) {
+    content = content.split(shouldShowOnboardingPattern).join('shouldShowOnboarding:!1');
+    patchCount++;
+    console.log('  [OK] Forced shouldShowOnboarding to false');
+}
+
+// Pattern 5: Replace homeScreen check to skip directly to chat
+const homeScreenCheckPattern = 'return!!(Y.hasCompletedProjectOnboarding||';
+if (content.includes(homeScreenCheckPattern)) {
+    content = content.split(homeScreenCheckPattern).join('return!0,');
+    patchCount++;
+    console.log('  [OK] Modified home screen check to skip welcome screen');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // WRITE PATCHED COPY (NOT modifying original!)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -721,3 +767,4 @@ console.log('[INFO] /cle-api command available - type / to see it in autocomplet
 console.log('[INFO] Security notes: Claude → Claudy, URL removed');
 console.log('[INFO] "Bienvenue!" and border frame removed from compact mode');
 console.log('[INFO] "API Usage Billing" removed from status line');
+console.log('[INFO] Welcome/onboarding screen SKIPPED - goes directly to chat');
