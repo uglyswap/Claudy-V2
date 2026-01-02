@@ -16,10 +16,10 @@
 
 .EXAMPLE
     PowerShell:
-    irm https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.ps1 | iex
-    
+    irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.ps1 | iex
+
     CMD:
-    curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.ps1 -o %TEMP%\uninstall.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\uninstall.ps1
+    curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.ps1 -o %TEMP%\uninstall.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\uninstall.ps1
 #>
 
 $ErrorActionPreference = "Stop"

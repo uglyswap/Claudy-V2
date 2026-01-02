@@ -11,7 +11,7 @@
 # - claudy uses cli-claudy.js, claude uses cli.js
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.sh | bash
 #
 
 set -e

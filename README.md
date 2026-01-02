@@ -1,4 +1,4 @@
-# Claudy
+# Claudy V2
 
 Un assistant de code IA dans votre terminal, propulsé par **GLM 4.7** (Z.AI).
 
@@ -6,8 +6,16 @@ Un assistant de code IA dans votre terminal, propulsé par **GLM 4.7** (Z.AI).
 
 ![](https://img.shields.io/badge/Node.js-18%2B-brightgreen?style=flat-square)
 ![](https://img.shields.io/badge/100%25-Ind%C3%A9pendant-blue?style=flat-square)
+![](https://img.shields.io/badge/V2.0-Latest-orange?style=flat-square)
 
-<img src="./demo.gif" />
+---
+
+## 🆕 Nouveautés V2
+
+- **Logo CLAUDY entièrement visible** - Plus de cadre ASCII qui rogne sur le logo
+- **Interface épurée** - Suppression des bordures autour du welcome screen
+- **100% Indépendant** - Installation isolée dans `~/.claudy/`
+- **AKHITHINK** - Mode réflexion profonde avec animation rainbow 🌈
 
 ---
 
@@ -48,13 +56,14 @@ Claudy est **complètement isolé** de Claude Code CLI. Les deux programmes sont
 - **Lecture web** : Extraction du contenu de pages web
 - **Mode sans permissions** : Pas de confirmations, Claudy travaille sans interruption
 - **AKHITHINK** : Mode de réflexion profonde avec animation rainbow 🌈
+- **Logo CLAUDY animé** : Affichage du logo avec dégradé de couleurs
 - **Installation isolée** : 100% indépendant de Claude Code CLI
 
 Tout est pré-configuré. Une seule clé API pour tout.
 
 ---
 
-## ⚡ Commande AKHITHINK
+## 🌈 Commande AKHITHINK
 
 **AKHITHINK** est la commande signature de Claudy pour activer le mode réflexion profonde.
 
@@ -111,32 +120,35 @@ Choisissez la version **LTS** (recommandée).
 
 ### Étape 2 : Obtenir une clé API Z.AI
 
-1. Allez sur **https://open.z.ai/**
+1. Allez sur **https://open.zai.cloud/**
 2. Créez un compte ou connectez-vous
 3. Allez dans la gestion des clés API
 4. Créez une nouvelle clé et copiez-la
 
-### Étape 3 : Installer Claudy
+### Étape 3 : Installer Claudy V2
 
 #### Windows - PowerShell (recommandé)
 
 Ouvrez PowerShell et collez :
+
 ```powershell
-irm https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 | iex
 ```
 
 #### Windows - CMD (Invite de commandes)
 
 Ouvrez CMD et collez :
+
 ```cmd
-curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 -o %TEMP%\install.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\install.ps1
+curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 -o %TEMP%\install.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\install.ps1
 ```
 
 #### Mac / Linux
 
 Ouvrez le Terminal et collez :
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.sh | bash
 ```
 
 L'installateur vous demandera votre clé API Z.AI.
@@ -162,19 +174,19 @@ C'est tout !
 ### Windows - PowerShell
 
 ```powershell
-irm https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.ps1 | iex
 ```
 
 ### Windows - CMD
 
 ```cmd
-curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.ps1 -o %TEMP%\uninstall.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\uninstall.ps1
+curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.ps1 -o %TEMP%\uninstall.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\uninstall.ps1
 ```
 
 ### Mac / Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.sh | bash
 ```
 
 Le désinstallateur supprime :
@@ -190,13 +202,14 @@ Le désinstallateur supprime :
 
 ### Comparaison Claudy vs Claude Code
 
-| | Claudy | Claude Code CLI |
-|---|--------|----------------|
+| | Claudy V2 | Claude Code CLI |
+|---|-----------|------------------|
 | **Commande** | `claudy` | `claude` |
 | **Installation** | `~/.claudy/lib/` (isolée) | npm global |
 | **Config** | `~/.claudy/settings.json` | `~/.claude/settings.json` |
 | **API** | Z.AI (GLM 4.7) | Anthropic |
 | **Dépendances** | Isolées dans ~/.claudy/ | npm global |
+| **Logo** | CLAUDY gradient | Claude original |
 
 ### Indépendance totale
 
@@ -234,6 +247,7 @@ La configuration de Claudy est stockée dans `~/.claudy/settings.json` :
 #### Méthode 1 : Dans Claudy (recommandé)
 
 Tapez directement dans Claudy :
+
 ```
 /cle-api VOTRE_NOUVELLE_CLE
 ```
@@ -256,6 +270,7 @@ Si votre clé est invalide ou manquante, Claudy vous demandera automatiquement u
 Par défaut, Claudy fonctionne en mode **bypass permissions** : il ne demande pas de confirmation pour les opérations sur les fichiers ou les commandes bash. C'est le mode recommandé pour une utilisation fluide.
 
 Pour réactiver les confirmations, modifiez `~/.claudy/settings.json` :
+
 ```json
 {
   "permissionMode": "default",
@@ -275,18 +290,20 @@ Claude Code utilise ces noms de variables en interne. En changeant `ANTHROPIC_BA
 
 **Non.** Claudy est 100% indépendant avec sa propre installation dans `~/.claudy/`. Les deux peuvent coexister sans conflit :
 - `claude` → Claude Code CLI officiel (npm global + `~/.claude/`)
-- `claudy` → Claudy avec GLM 4.7 (`~/.claudy/` uniquement)
+- `claudy` → Claudy V2 avec GLM 4.7 (`~/.claudy/` uniquement)
 
 ### La commande claudy ne fonctionne pas ?
 
-Après l'installation, **fermez et rouvrez votre terminal** pour que le PATH soit mis à jour. 
+Après l'installation, **fermez et rouvrez votre terminal** pour que le PATH soit mis à jour.
 
 Sur Windows, vérifiez que `~/.claudy/bin/` est dans votre PATH :
+
 ```powershell
 $env:PATH -split ';' | Select-String "claudy"
 ```
 
 Sur Mac/Linux :
+
 ```bash
 echo $PATH | tr ':' '\n' | grep claudy
 ```
@@ -294,9 +311,10 @@ echo $PATH | tr ':' '\n' | grep claudy
 ### Comment tout désinstaller (Claudy + Claude Code) ?
 
 Si vous voulez tout supprimer :
+
 ```bash
 # Supprimer Claudy (installation isolée)
-curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.sh | bash
 
 # Supprimer Claude Code CLI (installation npm globale)
 npm uninstall -g @anthropic-ai/claude-code
@@ -323,11 +341,11 @@ rm -rf ~/.claude
 │       └── @anthropic-ai/
 │           └── claude-code/
 │               ├── cli.js        # Original (non utilisé)
-│               └── cli-claudy.js # Patché avec branding Claudy
+│               └── cli-claudy.js # Patché avec branding Claudy V2
 ├── modules/
 │   └── Claudy-Logo.psm1 # Module PowerShell pour le logo
 ├── settings.json        # Configuration (API, MCP servers, hooks)
-└── CLAUDE.md            # System prompt personnalisé
+└── CLAUDE.md            # System prompt personnalisé (Claudy Focan)
 ```
 
 ---
@@ -335,5 +353,20 @@ rm -rf ~/.claude
 ## En savoir plus
 
 - **GLM 4.7** : Modèle d'IA développé par Zhipu AI
-- **Z.AI** : Plateforme d'API pour GLM - https://open.z.ai/
+- **Z.AI** : Plateforme d'API pour GLM - https://open.zai.cloud/
 - **Claude Code** : Outil de base développé par Anthropic
+- **Claudy V2** : Fork modifié avec branding CLAUDY et Z.AI integration
+
+---
+
+## Licence
+
+Ce projet est un fork de [Claude Code](https://code.claude.com/docs/en/overview) développé par Anthropic, modifié pour utiliser l'API Z.AI (GLM 4.7) à la place de l'API Anthropic.
+
+Les modifications sont :
+- Branding CLAUDY avec logo gradient
+- Intégration AKHITHINK
+- Configuration pour Z.AI (GLM 4.7)
+- Serveurs MCP pré-configurés
+- Installation isolée dans `~/.claudy/`
+- Suppression des cadres ASCII pour un affichage épuré

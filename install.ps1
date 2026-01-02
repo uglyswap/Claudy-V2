@@ -13,10 +13,10 @@
 
 .EXAMPLE
     PowerShell / PowerShell Core:
-    irm https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 | iex
+    irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 | iex
 
     CMD (Invite de commandes):
-    curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 -o %TEMP%\install.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\install.ps1
+    curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 -o %TEMP%\install.ps1 && powershell -ExecutionPolicy Bypass -File %TEMP%\install.ps1
 #>
 
 $ErrorActionPreference = "Stop"

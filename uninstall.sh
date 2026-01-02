@@ -12,7 +12,7 @@
 # - Any other npm packages
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/uninstall.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/uninstall.sh | bash
 #
 
 set -e
