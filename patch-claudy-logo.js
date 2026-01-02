@@ -224,26 +224,40 @@ if (skillsOccurrences > 0) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 7: COMPREHENSIVE REPLACE - Replace ALL .claude with .claudy
-// This is CRITICAL for MCP servers to work correctly!
-// Previous partial replacement broke MCP functionality
-// COMPREHENSIVE PATCH: Replace ALL occurrences of .claude with .claudy
-// This is CRITICAL for MCP servers to work correctly!
-// Previous partial replacement broke MCP functionality
-let originalContent = content;
+// PATCH 7: PRECISE REPLACEMENT - Replace ONLY file paths
+// This prevents breaking logos and other UI elements
+// Previous global replacement broke Claude/Claudy branding
+// ═══════════════════════════════════════════════════════════════════════════
+
 let totalReplaced = 0;
 
-// Use a simple regex replacement to catch ALL .claude patterns
-// This ensures the CLI uses ~/.claudy/ instead of ~/.claude/ for everything
-content = content.replace(/\.claude/g, '.claudy');
+// Replace ONLY specific file path patterns (NOT global search!)
+const pathReplacements = [
+  ['.claude.json', '.claudy.json'],
+  ['.claude/settings', '.claudy/settings'],
+  ['.claude/settings.local', '.claudy/settings.local'],
+  ['.claude/skills', '.claudy/skills'],
+  ['.claude,CLAUDE', '.claudy,CLAUDE'],
+  ['.claude,rules', '.claudy,rules']
+];
 
-// Count the replacements
-totalReplaced = (content.match(/.claudy/g) || []).length;
+for (const [from, to] of pathReplacements) {
+  // Use split/join for simple literal replacement (no regex needed)
+  const occurrences = content.split(from).length - 1;
+  if (occurrences > 0) {
+    content = content.split(from).join(to);
+    totalReplaced += occurrences;
+    console.log(`  [OK] Replaced ${occurrences}x "${from}" → "${to}"`);
+  }
+}
 
 if (totalReplaced > 0) {
     patchCount++;
-    console.log(`  [OK] Replaced ALL ${totalReplaced}x .claude → .claudy (COMPREHENSIVE)`);
-}// PATCH 8: Inject /cle-api and /cle as native slash commands
+    console.log(`  [SUMMARY] Total path replacements: ${totalReplaced}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PATCH 8: Inject /cle-api and /cle as native slash commands
 // These commands work WITHOUT the model - pure Node.js
 //
 // STRATEGY: Find the commands array MW9=W0(()=>[...,g89,m89,...])
