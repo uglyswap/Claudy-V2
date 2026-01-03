@@ -155,7 +155,7 @@ CLAUDY_DIR="$HOME/.claudy"
 CLAUDY_LIB_DIR="$CLAUDY_DIR/lib"
 LOGO_SCRIPT="$CLAUDY_DIR/bin/claudy-logo.sh"
 SETTINGS_PATH="$CLAUDY_DIR/settings.json"
-CLAUDE_JSON_PATH="$CLAUDY_DIR/.claudy.json"
+CLAUDE_JSON_PATH="$CLAUDY_DIR/.claude.json"
 
 # Check for --no-logo or -n flag
 SHOW_LOGO=true
@@ -210,7 +210,7 @@ update_api_key() {
         rm -f "${SETTINGS_PATH}.bak"
     fi
     
-    # Update .claudy.json (5 locations in MCP servers)
+    # Update .claude.json (4 locations in MCP servers)
     if [ -f "$CLAUDE_JSON_PATH" ]; then
         sed -i.bak "s|$old_key|$new_key|g" "$CLAUDE_JSON_PATH"
         rm -f "${CLAUDE_JSON_PATH}.bak"
@@ -321,10 +321,10 @@ try:
         settings = json.load(f)
     env_vars = settings.get('env', {})
     for key, value in env_vars.items():
-        escaped_value = str(value).replace(\"'\", \"'\\\\\\\"'\\\\\\\"'\")
+        escaped_value = str(value).replace(\"'\", \"'\\\\'\"'\")
         print(f\"export {key}='{escaped_value}'\")
 except Exception as e:
-    sys.stderr.write(f'Warning: Could not parse settings.json: {e}\\\\n')
+    sys.stderr.write(f'Warning: Could not parse settings.json: {e}\\n')
 " 2>/dev/null)
     elif command -v python &> /dev/null; then
         eval $(python -c "
@@ -335,10 +335,10 @@ try:
         settings = json.load(f)
     env_vars = settings.get('env', {})
     for key, value in env_vars.items():
-        escaped_value = str(value).replace(\"'\", \"'\\\\\\\"'\\\\\\\"'\")
+        escaped_value = str(value).replace(\"'\", \"'\\\\'\"'\")
         print('export {}=\\'{}\\''.format(key, escaped_value))
 except Exception as e:
-    sys.stderr.write('Warning: Could not parse settings.json: {}\\\\n'.format(e))
+    sys.stderr.write('Warning: Could not parse settings.json: {}\\n'.format(e))
 " 2>/dev/null)
     fi
 fi
@@ -444,7 +444,7 @@ echo -n "Entrez votre cle API Z.AI (ou appuyez sur Entree pour configurer plus t
 read API_KEY
 
 SETTINGS_PATH="$CLAUDY_DIR/settings.json"
-CLAUDE_JSON_PATH="$CLAUDY_DIR/.claudy.json"
+CLAUDE_JSON_PATH="$CLAUDY_DIR/.claude.json"
 
 KEY_CONFIGURED=true
 if [ -z "$API_KEY" ]; then
@@ -484,71 +484,46 @@ echo -e "${GREEN}[OK] Mode bypass permissions active${NC}"
 echo -e "${GREEN}[OK] Auto-updater desactive${NC}"
 
 # ============================================
-# CREATE .claudy.json WITH MCP SERVERS DIRECTLY
+# CREATE .claude.json WITH MCP SERVERS (Standard Claude Code format)
 # ============================================
-HOME_DIR_KEY="$HOME"
-CLAUDE_JSON_CONTENT=$(cat << CLAUDEEOF
+cat > "$CLAUDE_JSON_PATH" << EOF
 {
-  "projects": {
-    "$HOME_DIR_KEY": {
-      "allowedTools": [],
-      "mcpContextUris": [],
-      "mcpServers": {
-        "zai-vision": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "@z_ai/mcp-server"],
-          "env": {
-            "Z_AI_API_KEY": "$API_KEY",
-            "Z_AI_MODE": "ZAI"
-          }
-        },
-        "web-search-prime": {
-          "type": "http",
-          "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
-          "headers": {
-            "Authorization": "Bearer $API_KEY"
-          }
-        },
-        "web-reader": {
-          "type": "http",
-          "url": "https://api.z.ai/api/mcp/web_reader/mcp",
-          "headers": {
-            "Authorization": "Bearer $API_KEY"
-          }
-        },
-        "zread": {
-          "type": "http",
-          "url": "https://api.z.ai/api/mcp/zread/mcp",
-          "headers": {
-            "Authorization": "Bearer $API_KEY"
-          }
-        }
-      },
-      "enabledMcpjsonServers": [],
-      "disabledMcpjsonServers": [],
-      "hasTrustDialogAccepted": false,
-      "projectOnboardingSeenCount": 0,
-      "hasClaudeMdExternalIncludesApproved": false,
-      "hasClaudeMdExternalIncludesWarningShown": false,
-      "exampleFiles": [],
-      "reactVulnerabilityCache": {
-        "detected": false,
-        "package": null,
-        "packageName": null,
-        "version": null,
-        "packageManager": null
-      },
-      "hasCompletedProjectOnboarding": true
+  "mcpServers": {
+    "zai-vision": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@z_ai/mcp-server"],
+      "env": {
+        "Z_AI_API_KEY": "$API_KEY",
+        "Z_AI_MODE": "ZAI"
+      }
+    },
+    "web-search-prime": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
+    },
+    "web-reader": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
+    },
+    "zread": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
     }
   }
 }
-CLAUDEEOF
-)
+EOF
 
-echo "$CLAUDE_JSON_CONTENT" > "$CLAUDE_JSON_PATH"
-
-echo -e "${GREEN}[OK] 4 serveurs MCP configures dans .claudy.json${NC}"
+echo -e "${GREEN}[OK] 4 serveurs MCP configures dans .claude.json${NC}"
 echo -e "${GREEN}[OK] Nouveau serveur 'zread' ajoute${NC}"
 
 # ============================================
@@ -591,7 +566,7 @@ echo -e "${WHITE}Claudy est 100% independant de Claude Code :${NC}"
 echo -e "${GRAY}  - Installation isolee : ~/.claudy/lib/${NC}"
 echo -e "${GRAY}  - CLI patche : cli-claudy.js (pas cli.js)${NC}"
 echo -e "${GRAY}  - Configuration isolee : ~/.claudy/settings.json${NC}"
-echo -e "${GRAY}  - MCP servers dans : ~/.claudy/.claudy.json${NC}"
+echo -e "${GRAY}  - MCP servers dans : ~/.claudy/.claude.json${NC}"
 echo -e "${GRAY}  - Binaires isoles : ~/.claudy/bin/${NC}"
 echo ""
 echo -e "${WHITE}Claude Code (officiel) reste intact :${NC}"
@@ -617,6 +592,6 @@ echo -e "${GRAY}  ~/.claudy/${NC}"
 echo -e "${GRAY}    +-- bin/           (claudy)${NC}"
 echo -e "${GRAY}    +-- lib/           (node_modules avec cli-claudy.js)${NC}"
 echo -e "${GRAY}    +-- settings.json  (configuration env uniquement)${NC}"
-echo -e "${GRAY}    +-- .claudy.json   (MCP servers + projets)${NC}"
+echo -e "${GRAY}    +-- .claude.json   (MCP servers - format standard)${NC}"
 echo -e "${GRAY}    +-- CLAUDE.md      (system prompt)${NC}"
 echo ""
