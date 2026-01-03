@@ -73,6 +73,7 @@ if [[ "$PROMPT" =~ ^/(cle-api|cle)(\s+(.+))?$ ]]; then
     echo "- Z_AI_API_KEY (vision): OK"
     echo "- Authorization web-search-prime: OK"
     echo "- Authorization web-reader: OK"
+    echo "- Authorization zread: OK"
     echo ""
     echo "$COUNT occurrence(s) remplacee(s)"
     echo ""
