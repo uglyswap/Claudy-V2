@@ -108,7 +108,7 @@ if (content.includes('"Claude Code"')) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 3: Replace the logo with CLAUDY ASCII art
+// PATCH 3: Replace the logo with CLAUDY ASCII art - DISABLED (using PowerShell animated logo only)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // CLAUDY ASCII Logo lines with gradient colors (Yellow -> Orange -> Rose -> Magenta)
@@ -133,11 +133,12 @@ const newLogoStructure1 = [
     `u2.createElement(C,{color:"#ffff00"},"${tagline}")`
 ].join(',');
 
-if (content.includes(oldLogoPattern1)) {
-    content = content.replace(oldLogoPattern1, newLogoStructure1);
-    patchCount++;
-    console.log('  [OK] Replaced logo pattern 1 (u2.createElement) with Claudy gradient');
-}
+// Logo pattern 1 replacement DISABLED - PowerShell animated logo is used instead
+// if (content.includes(oldLogoPattern1)) {
+//     content = content.replace(oldLogoPattern1, newLogoStructure1);
+//     patchCount++;
+//     console.log("  [OK] Replaced logo pattern 1 (u2.createElement) with Claudy gradient");
+// }
 
 // Original logo structure pattern - version $B
 const oldLogoPattern2 = `$B.createElement(C,null,$B.createElement(C,{color:"text"}," *"),$B.createElement(C,{color:"ice_blue"}," ▐"),$B.createElement(C,{color:"ice_blue",backgroundColor:"clawd_background"},"▛███▜"),$B.createElement(C,{color:"ice_blue"},"▌"),$B.createElement(C,{color:"text"}," *")),$B.createElement(C,null,$B.createElement(C,{color:"text"},"*"),$B.createElement(C,{color:"ice_blue"}," ▝▜"),$B.createElement(C,{color:"ice_blue",backgroundColor:"clawd_background"},"█████"),$B.createElement(C,{color:"ice_blue"},"▛▘"),$B.createElement(C,{color:"text"}," *")),$B.createElement(C,null,$B.createElement(C,{color:"text"}," * "),$B.createElement(C,{color:"ice_blue"}," ▘▘ ▝▝","  "),$B.createElement(C,{color:"text"},"*"))`;
@@ -148,11 +149,12 @@ const newLogoStructure2 = [
     `$B.createElement(C,{color:"#ffff00"},"${tagline}")`
 ].join(',');
 
-if (content.includes(oldLogoPattern2)) {
-    content = content.replace(oldLogoPattern2, newLogoStructure2);
-    patchCount++;
-    console.log('  [OK] Replaced logo pattern 2 ($B.createElement) with Claudy gradient');
-}
+// Logo pattern 2 replacement DISABLED - PowerShell animated logo is used instead
+// if (content.includes(oldLogoPattern2)) {
+//     content = content.replace(oldLogoPattern2, newLogoStructure2);
+//     patchCount++;
+//     console.log("  [OK] Replaced logo pattern 2 (.createElement) with Claudy gradient");
+// }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PATCH 4: Add AKHITHINK detection to ultrathink function
