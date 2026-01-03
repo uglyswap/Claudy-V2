@@ -192,16 +192,6 @@ try {
     Write-Host "[WARN] Impossible de telecharger claudy.ps1" -ForegroundColor Yellow
 }
 
-# Download sync-mcp.js
-$syncMcpUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
-$syncMcpPath = Join-Path $claudyBinDir "sync-mcp.js"
-try {
-    Invoke-WebRequest -Uri $syncMcpUrl -OutFile $syncMcpPath -UseBasicParsing
-    Write-Host "[OK] sync-mcp.js telecharge" -ForegroundColor Green
-} catch {
-    Write-Host "[WARN] Impossible de telecharger sync-mcp.js" -ForegroundColor Yellow
-}
-
 # Create batch file in ~/.claudy/bin/
 $claudyCmdPath = Join-Path $claudyBinDir "claudy.cmd"
 $claudyCmdContent = @"
@@ -292,6 +282,7 @@ Write-Host ""
 $apiKey = Read-Host "Entrez votre cle API Z.AI (ou appuyez sur Entree pour configurer plus tard)"
 
 $settingsPath = Join-Path $claudyDir "settings.json"
+$claudyJsonPath = Join-Path $claudyDir ".claudy.json"
 
 $keyConfigured = $true
 if ([string]::IsNullOrWhiteSpace($apiKey)) {
@@ -302,8 +293,9 @@ if ([string]::IsNullOrWhiteSpace($apiKey)) {
     Write-Host "       Au demarrage de Claudy, il vous demandera votre cle." -ForegroundColor Yellow
 }
 
-# Create settings.json with GLM config, MCP servers, and bypass permissions
-# NOTE: No hooks in settings.json - /cle-api is now a native command injected in cli-claudy.js
+# ============================================
+# CREATE settings.json WITH ENV ONLY (NO MCP SERVERS)
+# ============================================
 $settingsContent = @"
 {
   "permissionMode": "bypassPermissions",
@@ -321,40 +313,80 @@ $settingsContent = @"
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.7",
     "DISABLE_AUTOUPDATER": "1"
-  },
-  "mcpServers": {
-    "zai-vision": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@z_ai/mcp-server"],
-      "env": {
-        "Z_AI_API_KEY": "$apiKey",
-        "Z_AI_MODE": "ZAI"
-      }
-    },
-    "web-search-prime": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      "headers": {
-        "Authorization": "Bearer $apiKey"
-      }
-    },
-    "web-reader": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
-      "headers": {
-        "Authorization": "Bearer $apiKey"
-      }
-    }
   }
 }
 "@
 
 $settingsContent | Out-File -FilePath $settingsPath -Encoding utf8 -Force
-Write-Host "[OK] Configuration GLM 4.7 creee" -ForegroundColor Green
+Write-Host "[OK] Configuration GLM 4.7 creee (settings.json)" -ForegroundColor Green
 Write-Host "[OK] Mode bypass permissions active" -ForegroundColor Green
 Write-Host "[OK] Auto-updater desactive" -ForegroundColor Green
-Write-Host "[OK] 3 serveurs MCP configures" -ForegroundColor Green
+
+# ============================================
+# CREATE .claudy.json WITH MCP SERVERS DIRECTLY
+# ============================================
+$homeDirKey = $env:USERPROFILE.Replace('\', '/')
+$claudyJsonContent = @"
+{
+  "projects": {
+    "$homeDirKey": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {
+        "zai-vision": {
+          "type": "stdio",
+          "command": "npx",
+          "args": ["-y", "@z_ai/mcp-server"],
+          "env": {
+            "Z_AI_API_KEY": "$apiKey",
+            "Z_AI_MODE": "ZAI"
+          }
+        },
+        "web-search-prime": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+          "headers": {
+            "Authorization": "Bearer $apiKey"
+          }
+        },
+        "web-reader": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+          "headers": {
+            "Authorization": "Bearer $apiKey"
+          }
+        },
+        "zread": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/zread/mcp",
+          "headers": {
+            "Authorization": "Bearer $apiKey"
+          }
+        }
+      },
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "hasCompletedProjectOnboarding": true
+    }
+  }
+}
+"@
+
+$claudyJsonContent | Out-File -FilePath $claudyJsonPath -Encoding utf8 -Force
+Write-Host "[OK] 4 serveurs MCP configures dans .claudy.json" -ForegroundColor Green
+Write-Host "[OK] Nouveau serveur 'zread' ajoute" -ForegroundColor Green
 
 # Download CLAUDE.md from GitHub
 $claudeMdPath = Join-Path $claudyDir "CLAUDE.md"
@@ -395,6 +427,7 @@ Write-Host "Claudy est 100% independant de Claude Code :" -ForegroundColor White
 Write-Host "  - Installation isolee : ~/.claudy/lib/" -ForegroundColor Gray
 Write-Host "  - CLI patche : cli-claudy.js (pas cli.js)" -ForegroundColor Gray
 Write-Host "  - Configuration isolee : ~/.claudy/settings.json" -ForegroundColor Gray
+Write-Host "  - MCP servers dans : ~/.claudy/.claudy.json" -ForegroundColor Gray
 Write-Host "  - Binaires isoles : ~/.claudy/bin/" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Claude Code (officiel) reste intact :" -ForegroundColor White
@@ -408,6 +441,7 @@ Write-Host "  - GLM 4.7 (pas besoin de compte Anthropic)" -ForegroundColor Green
 Write-Host "  - Vision IA (images, videos, OCR)" -ForegroundColor Green
 Write-Host "  - Recherche web" -ForegroundColor Green
 Write-Host "  - Lecture de pages web" -ForegroundColor Green
+Write-Host "  - Lecture de fichiers distants (zread)" -ForegroundColor Green
 Write-Host "  - Mode sans permissions (pas de confirmations)" -ForegroundColor Green
 Write-Host "  - Version figee $CLAUDE_CODE_VERSION (pas de mises a jour auto)" -ForegroundColor Green
 Write-Host "  - AKHITHINK: Deep reasoning mode" -ForegroundColor Magenta
@@ -419,6 +453,7 @@ Write-Host "  ~/.claudy/" -ForegroundColor DarkGray
 Write-Host "    +-- bin/           (claudy.ps1, claudy.cmd)" -ForegroundColor DarkGray
 Write-Host "    +-- lib/           (node_modules avec cli-claudy.js)" -ForegroundColor DarkGray
 Write-Host "    +-- modules/       (Claudy-Logo.psm1)" -ForegroundColor DarkGray
-Write-Host "    +-- settings.json  (configuration)" -ForegroundColor DarkGray
+Write-Host "    +-- settings.json  (configuration env uniquement)" -ForegroundColor DarkGray
+Write-Host "    +-- .claudy.json   (MCP servers + projets)" -ForegroundColor DarkGray
 Write-Host "    +-- CLAUDE.md      (system prompt)" -ForegroundColor DarkGray
 Write-Host ""
