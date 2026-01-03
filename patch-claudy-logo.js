@@ -673,28 +673,6 @@ if (content.includes(bienvenueCompactPattern2)) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 23: Remove border frame from compact mode welcome screen
-// This removes the borderStyle:"round" and borderText from the compact mode box
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Remove the border configuration from compact mode
-const compactBorderPattern = ',borderStyle:"round",borderColor:"claude",borderText:{content:g,position:"top",align:"start",offset:1}';
-if (content.includes(compactBorderPattern)) {
-    content = content.split(compactBorderPattern).join('');
-    patchCount++;
-    console.log('  [OK] Removed border frame from compact mode welcome box');
-}
-
-// Also remove the borderText variable definition if it's only used for the border
-const borderTextVarPattern = ',g=sQ("claude",S)(" Claude Code ")';
-if (content.includes(borderTextVarPattern)) {
-    content = content.split(borderTextVarPattern).join('');
-    patchCount++;
-    console.log('  [OK] Removed borderText variable (no longer needed)');
-}
-
-
-// ═══════════════════════════════════════════════════════════════════════════
 // PATCH 24: SKIP WELCOME/ONBOARDING SCREEN - Go directly to chat
 // This forces the app to skip the welcome screen with Security Notes
 // ═══════════════════════════════════════════════════════════════════════════
