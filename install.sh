@@ -506,13 +506,6 @@ cat > "$SETTINGS_PATH" << EOF
         "Authorization": "Bearer $API_KEY"
       }
     },
-    "zread": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/zread/mcp",
-      "headers": {
-        "Authorization": "Bearer $API_KEY"
-      }
-    },
     "web-reader": {
       "type": "http",
       "url": "https://api.z.ai/api/mcp/web_reader/mcp",
@@ -527,7 +520,7 @@ EOF
 echo -e "${GREEN}[OK] Configuration GLM 4.7 creee${NC}"
 echo -e "${GREEN}[OK] Mode bypass permissions active${NC}"
 echo -e "${GREEN}[OK] Auto-updater desactive${NC}"
-echo -e "${GREEN}[OK] 4 serveurs MCP configures${NC}"
+echo -e "${GREEN}[OK] 3 serveurs MCP configures${NC}"
 
 # ============================================
 # DOWNLOAD CLAUDE.MD FROM GITHUB

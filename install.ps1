@@ -339,13 +339,6 @@ $settingsContent = @"
         "Authorization": "Bearer $apiKey"
       }
     },
-    "zread": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/zread/mcp",
-      "headers": {
-        "Authorization": "Bearer $apiKey"
-      }
-    },
     "web-reader": {
       "type": "http",
       "url": "https://api.z.ai/api/mcp/web_reader/mcp",
@@ -361,7 +354,7 @@ $settingsContent | Out-File -FilePath $settingsPath -Encoding utf8 -Force
 Write-Host "[OK] Configuration GLM 4.7 creee" -ForegroundColor Green
 Write-Host "[OK] Mode bypass permissions active" -ForegroundColor Green
 Write-Host "[OK] Auto-updater desactive" -ForegroundColor Green
-Write-Host "[OK] 4 serveurs MCP configures" -ForegroundColor Green
+Write-Host "[OK] 3 serveurs MCP configures" -ForegroundColor Green
 
 # Download CLAUDE.md from GitHub
 $claudeMdPath = Join-Path $claudyDir "CLAUDE.md"

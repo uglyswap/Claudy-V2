@@ -96,7 +96,6 @@ if ($prompt -match "^/(cle-api|cle)(\s+(.+))?$") {
     Write-Host "- Z_AI_API_KEY (vision): OK" -ForegroundColor Green
     Write-Host "- Authorization web-search-prime: OK" -ForegroundColor Green
     Write-Host "- Authorization web-reader: OK" -ForegroundColor Green
-    Write-Host "- Authorization zread: OK" -ForegroundColor Green
     Write-Host ""
     Write-Host "$countBefore occurrence(s) remplacee(s)" -ForegroundColor Cyan
     Write-Host ""
