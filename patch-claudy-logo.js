@@ -387,70 +387,55 @@ if (content.includes('Welcome to Claude Code')) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // PATCH 12b: Remove the ASCII border/frame around the logo
-// This removes the box-drawing characters border from the welcome screen
+// FIXED: Uses valid borderStyle value instead of void
 // ═══════════════════════════════════════════════════════════════════════════
 
-// The borderStyle:"round" creates the ASCII border. We replace it with void (no border)
-if (content.includes('borderStyle:"round",borderColor:"success"')) {
-    content = content.split('borderStyle:"round",borderColor:"success"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed borderStyle:"round" from success dialog');
+// Liste des combinaisons borderStyle + borderColor à corriger
+const borderCombinations = [
+    'borderStyle:"round",borderColor:"success"',
+    'borderStyle:"round",borderColor:"warning"',
+    'borderStyle:"round",borderColor:"error"',
+    'borderStyle:"round",borderColor:"permission"',
+    'borderStyle:"round",borderColor:"chromeYellow"'
+];
+
+for (const combo of borderCombinations) {
+    if (content.includes(combo)) {
+        // ✅ CORRIGÉ: On garde borderColor mais on met borderStyle à "none"
+        const fixed = combo.replace('borderStyle:"round"', 'borderStyle:"none"');
+        content = content.split(combo).join(fixed);
+        patchCount++;
+        console.log(`  [OK] Fixed ${combo}`);
+    }
 }
 
-if (content.includes('borderStyle:"round",borderColor:"warning"')) {
-    content = content.split('borderStyle:"round",borderColor:"warning"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed borderStyle:"round" from warning dialog');
-}
-
-if (content.includes('borderStyle:"round",borderColor:"error"')) {
-    content = content.split('borderStyle:"round",borderColor:"error"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed borderStyle:"round" from error dialog');
-}
-
-if (content.includes('borderStyle:"round",borderColor:"permission"')) {
-    content = content.split('borderStyle:"round",borderColor:"permission"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed borderStyle:"round" from permission dialog');
-}
-
-if (content.includes('borderStyle:"round",borderColor:"chromeYellow"')) {
-    content = content.split('borderStyle:"round",borderColor:"chromeYellow"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed borderStyle:"round" from chrome dialog');
-}
-
-// Also remove any remaining borderStyle:"round" without specific color
-if (content.includes('borderStyle:"round"')) {
-    content = content.split('borderStyle:"round"').join('borderStyle:void');
-    patchCount++;
-    console.log('  [OK] Removed remaining borderStyle:"round" borders');
-}
-
-// Remove ALL borderStyle patterns - double, single, thick, etc.
-const borderStyles = ['double', 'single', 'thick', 'bold'];
+// Remplacer les borderStyle isolés (sans borderColor)
+const borderStyles = ['round', 'double', 'single', 'thick', 'bold'];
 for (const style of borderStyles) {
-    const borderPattern = `borderStyle:"${style}"`;
-    if (content.includes(borderPattern)) {
-        content = content.split(borderPattern).join('borderStyle:void');
+    const pattern = `borderStyle:"${style}"`;
+    if (content.includes(pattern)) {
+        content = content.split(pattern).join('borderStyle:"none"');
         patchCount++;
-        console.log(`  [OK] Removed borderStyle:"${style}" borders`);
+        console.log(`  [OK] Replaced borderStyle:"${style}" → borderStyle:"none"`);
     }
 }
 
-// Remove any borderColor patterns to ensure borders don't show up
-const borderColors = ['success', 'warning', 'error', 'permission', 'chromeYellow', 'ice_blue', 'text'];
-for (const color of borderColors) {
-    const colorPattern = `borderColor:"${color}"`;
-    if (content.includes(colorPattern)) {
-        content = content.split(colorPattern).join('');
-        patchCount++;
-        console.log(`  [OK] Removed borderColor:"${color}"`);
-    }
+// ✅ SUPPRIMÉ: La boucle qui effaçait borderColor (causait les virgules doubles)
+// Les borderColor sont maintenant conservés pour éviter les erreurs de syntaxe
+
+// Nettoyage des erreurs héritées (si le fichier a déjà été patché avec l'ancien code)
+if (content.includes('borderStyle:void')) {
+    content = content.split('borderStyle:void').join('borderStyle:"none"');
+    console.log('  [OK] Fixed legacy borderStyle:void → borderStyle:"none"');
 }
 
+// Supprimer les doubles virgules résiduelles
+while (content.includes(',,')) {
+    content = content.split(',,').join(',');
+    console.log('  [OK] Cleaned up double commas');
+}
 // ═══════════════════════════════════════════════════════════════════════════
 // PATCH 13: Replace U17 alternative logo function (u2 version)
 // This function displays a simplified logo for certain terminals
