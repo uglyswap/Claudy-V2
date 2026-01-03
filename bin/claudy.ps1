@@ -10,6 +10,7 @@ $claudyDir = Join-Path $env:USERPROFILE ".claudy"
 $claudyLibDir = Join-Path $claudyDir "lib"
 $modulePath = Join-Path $claudyDir "modules\Claudy-Logo.psm1"
 $settingsPath = Join-Path $claudyDir "settings.json"
+$claudyJsonPath = Join-Path $claudyDir ".claudy.json"
 
 # Check for --no-logo or -n flag
 $showLogo = $true
@@ -22,11 +23,12 @@ foreach ($arg in $args) {
     }
 }
 
-# Show animated logo if module exists and not disabled
+# Show static logo if module exists and not disabled
+# PowerShell uses static logo (no animation)
 if ($showLogo -and (Test-Path $modulePath)) {
     try {
         Import-Module $modulePath -Force -ErrorAction SilentlyContinue
-        Claudy-Logo -Force
+        Claudy-Logo -NoAnimation -Force
     } catch {
         # Silently continue if logo fails
     }
@@ -78,6 +80,28 @@ function Update-ApiKeyInSettings {
         [System.IO.File]::WriteAllText($settingsPath, $newContent, [System.Text.UTF8Encoding]::new($true))
 
         return $true
+    } catch {
+        return $false
+    }
+}
+
+function Update-ApiKeyInClaudyJson {
+    param([string]$NewKey, [string]$OldKey)
+
+    try {
+        if (Test-Path $claudyJsonPath) {
+            $content = Get-Content $claudyJsonPath -Raw -Encoding UTF8
+
+            # Replace all occurrences of old key with new key
+            # This updates all 4 MCP server locations
+            $newContent = $content -replace [regex]::Escape($OldKey), $NewKey
+
+            # Write back
+            [System.IO.File]::WriteAllText($claudyJsonPath, $newContent, [System.Text.UTF8Encoding]::new($true))
+
+            return $true
+        }
+        return $false
     } catch {
         return $false
     }
@@ -147,19 +171,23 @@ if ($keyNeedsUpdate) {
             Write-Host "[WARN] Le format de la cle semble inhabituel, mais on continue..." -ForegroundColor Yellow
         }
 
-        # Update settings.json with new key in all 4 locations
+        # Update API key in both files (5 locations total)
         $oldKeyToReplace = if ($apiKey) { $apiKey } else { "VOTRE_CLE_API_ZAI_ICI" }
-        $success = Update-ApiKeyInSettings -NewKey $newKey -OldKey $oldKeyToReplace
+        
+        $success1 = Update-ApiKeyInSettings -NewKey $newKey -OldKey $oldKeyToReplace
+        $success2 = Update-ApiKeyInClaudyJson -NewKey $newKey -OldKey $oldKeyToReplace
 
-        if ($success) {
+        if ($success1 -and $success2) {
             Write-Host ""
-            Write-Host "[OK] Cle API mise a jour dans les 4 emplacements" -ForegroundColor Green
+            Write-Host "[OK] Cle API mise a jour dans les 5 emplacements" -ForegroundColor Green
+            Write-Host "    - settings.json (env.ANTHROPIC_AUTH_TOKEN)" -ForegroundColor Gray
+            Write-Host "    - .claudy.json (4 serveurs MCP)" -ForegroundColor Gray
             Write-Host ""
 
             # Update apiKey variable for env export
             $apiKey = $newKey
         } else {
-            Write-Host "[ERREUR] Impossible de mettre a jour settings.json" -ForegroundColor Red
+            Write-Host "[ERREUR] Impossible de mettre a jour les fichiers de configuration" -ForegroundColor Red
             exit 1
         }
     } else {
@@ -209,18 +237,6 @@ if (-not (Test-Path $claudyExe)) {
 # Fallback to cli.js if cli-claudy.js still doesn't exist
 if (-not (Test-Path $claudyExe)) {
     $claudyExe = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli.js"
-}
-
-# ============================================
-# SYNC MCP SERVERS FROM settings.json TO .claudy.json
-# ============================================
-$syncMcpScript = Join-Path $claudyDir "bin\sync-mcp.js"
-if (Test-Path $syncMcpScript) {
-    try {
-        $null = & node $syncMcpScript 2>&1
-    } catch {
-        # Silently continue if sync fails
-    }
 }
 
 
