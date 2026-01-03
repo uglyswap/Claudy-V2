@@ -194,7 +194,7 @@ $claudyExe = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli
 # AUTO-REPAIR: If cli-claudy.js doesn't exist, recreate it
 if (-not (Test-Path $claudyExe)) {
     Write-Host "[AUTO-REPAIR] cli-claudy.js manquant, re-creation en cours..." -ForegroundColor Yellow
-    $patchUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+    $patchUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
     $patchPath = Join-Path $env:TEMP "patch-claudy-logo.js"
     try {
         Invoke-WebRequest -Uri $patchUrl -OutFile $patchPath -UseBasicParsing -ErrorAction Stop
@@ -230,6 +230,6 @@ if (Test-Path $claudyExe) {
     & node $claudyExe --dangerously-skip-permissions @filteredArgs
 } else {
     Write-Host "[ERREUR] Claudy introuvable. Reinstallez avec:" -ForegroundColor Red
-    Write-Host "irm https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 | iex" -ForegroundColor Yellow
+    Write-Host "irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 | iex" -ForegroundColor Yellow
     exit 1
 }

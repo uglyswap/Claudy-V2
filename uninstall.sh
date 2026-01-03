@@ -140,7 +140,7 @@ if [ $ERRORS -eq 0 ]; then
     echo -e "${CYAN}  source $SHELL_RC${NC}"
     echo ""
     echo -e "${GRAY}Pour reinstaller Claudy:${NC}"
-    echo -e "${CYAN}  curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.sh | bash${NC}"
+    echo -e "${CYAN}  curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.sh | bash${NC}"
 else
     echo -e "${YELLOW}========================================${NC}"
     echo -e "${YELLOW}  DESINSTALLATION PARTIELLE            ${NC}"

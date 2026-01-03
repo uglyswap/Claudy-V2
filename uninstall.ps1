@@ -140,7 +140,7 @@ if ($errors.Count -eq 0) {
     Write-Host "La commande 'claudy' n'est plus disponible." -ForegroundColor White
     Write-Host ""
     Write-Host "Pour reinstaller Claudy:" -ForegroundColor Gray
-    Write-Host "  irm https://raw.githubusercontent.com/uglyswap/Claudy/main/install.ps1 | iex" -ForegroundColor Cyan
+    Write-Host "  irm https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.ps1 | iex" -ForegroundColor Cyan
 } else {
     Write-Host "========================================" -ForegroundColor Yellow
     Write-Host "  DESINSTALLATION PARTIELLE            " -ForegroundColor Yellow

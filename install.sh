@@ -128,7 +128,7 @@ fi
 
 # Download logo script
 echo -e "${YELLOW}Installation du logo anime...${NC}"
-LOGO_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/claudy-logo.sh"
+LOGO_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/claudy-logo.sh"
 LOGO_SCRIPT_PATH="$CLAUDY_BIN_DIR/claudy-logo.sh"
 curl -fsSL "$LOGO_SCRIPT_URL" -o "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 chmod +x "$LOGO_SCRIPT_PATH" 2>/dev/null || true
@@ -395,7 +395,7 @@ if [ -f "$CLAUDY_EXE" ]; then
     exec node "$CLAUDY_EXE" --dangerously-skip-permissions "${ARGS[@]}"
 else
     echo -e "\033[0;31m[ERREUR] Claudy introuvable. Reinstallez avec:\033[0m"
-    echo -e "\033[1;33mcurl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.sh | bash\033[0m"
+    echo -e "\033[1;33mcurl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.sh | bash\033[0m"
     exit 1
 fi
 WRAPPER
@@ -528,7 +528,7 @@ echo -e "${GREEN}[OK] 3 serveurs MCP configures${NC}"
 echo -e "${YELLOW}Installation du system prompt...${NC}"
 
 CLAUDE_MD_PATH="$CLAUDY_DIR/CLAUDE.md"
-CLAUDE_MD_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/CLAUDE.md"
+CLAUDE_MD_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/CLAUDE.md"
 
 if curl -fsSL "$CLAUDE_MD_URL" -o "$CLAUDE_MD_PATH" 2>/dev/null; then
     echo -e "${MAGENTA}[OK] System prompt AKHITHINK installe${NC}"
