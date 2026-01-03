@@ -10,7 +10,7 @@ $claudyDir = Join-Path $env:USERPROFILE ".claudy"
 $claudyLibDir = Join-Path $claudyDir "lib"
 $modulePath = Join-Path $claudyDir "modules\Claudy-Logo.psm1"
 $settingsPath = Join-Path $claudyDir "settings.json"
-$claudyJsonPath = Join-Path $claudyDir ".claudy.json"
+$claudeJsonPath = Join-Path $claudyDir ".claude.json"
 
 # Check for --no-logo or -n flag
 $showLogo = $true
@@ -85,19 +85,19 @@ function Update-ApiKeyInSettings {
     }
 }
 
-function Update-ApiKeyInClaudyJson {
+function Update-ApiKeyInClaudeJson {
     param([string]$NewKey, [string]$OldKey)
 
     try {
-        if (Test-Path $claudyJsonPath) {
-            $content = Get-Content $claudyJsonPath -Raw -Encoding UTF8
+        if (Test-Path $claudeJsonPath) {
+            $content = Get-Content $claudeJsonPath -Raw -Encoding UTF8
 
             # Replace all occurrences of old key with new key
             # This updates all 4 MCP server locations
             $newContent = $content -replace [regex]::Escape($OldKey), $NewKey
 
             # Write back
-            [System.IO.File]::WriteAllText($claudyJsonPath, $newContent, [System.Text.UTF8Encoding]::new($true))
+            [System.IO.File]::WriteAllText($claudeJsonPath, $newContent, [System.Text.UTF8Encoding]::new($true))
 
             return $true
         }
@@ -175,13 +175,13 @@ if ($keyNeedsUpdate) {
         $oldKeyToReplace = if ($apiKey) { $apiKey } else { "VOTRE_CLE_API_ZAI_ICI" }
         
         $success1 = Update-ApiKeyInSettings -NewKey $newKey -OldKey $oldKeyToReplace
-        $success2 = Update-ApiKeyInClaudyJson -NewKey $newKey -OldKey $oldKeyToReplace
+        $success2 = Update-ApiKeyInClaudeJson -NewKey $newKey -OldKey $oldKeyToReplace
 
         if ($success1 -and $success2) {
             Write-Host ""
             Write-Host "[OK] Cle API mise a jour dans les 5 emplacements" -ForegroundColor Green
             Write-Host "    - settings.json (env.ANTHROPIC_AUTH_TOKEN)" -ForegroundColor Gray
-            Write-Host "    - .claudy.json (4 serveurs MCP)" -ForegroundColor Gray
+            Write-Host "    - .claude.json (4 serveurs MCP)" -ForegroundColor Gray
             Write-Host ""
 
             # Update apiKey variable for env export
