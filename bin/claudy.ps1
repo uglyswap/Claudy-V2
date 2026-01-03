@@ -211,6 +211,19 @@ if (-not (Test-Path $claudyExe)) {
     $claudyExe = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli.js"
 }
 
+# ============================================
+# SYNC MCP SERVERS FROM settings.json TO .claudy.json
+# ============================================
+$syncMcpScript = Join-Path $claudyDir "bin\sync-mcp.js"
+if (Test-Path $syncMcpScript) {
+    try {
+        $null = & node $syncMcpScript 2>&1
+    } catch {
+        # Silently continue if sync fails
+    }
+}
+
+
 if (Test-Path $claudyExe) {
     # Always add --dangerously-skip-permissions to bypass folder confirmation
     # Claudy trusts all directories by default (no "Do you want to work in this folder?" prompt)

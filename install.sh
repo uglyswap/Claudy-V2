@@ -380,6 +380,15 @@ if [ ! -f "$CLAUDY_EXE" ]; then
     CLAUDY_EXE="$CLAUDY_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli.js"
 fi
 
+
+# ============================================
+# SYNC MCP SERVERS FROM settings.json TO .claudy.json
+# ============================================
+SYNC_MCP_SCRIPT="$CLAUDY_DIR/bin/sync-mcp.js"
+if [ -f "$SYNC_MCP_SCRIPT" ]; then
+    node "$SYNC_MCP_SCRIPT" 2>/dev/null || true
+fi
+ 
 if [ -f "$CLAUDY_EXE" ]; then
     # Always add --dangerously-skip-permissions to bypass folder confirmation
     # Claudy trusts all directories by default (no "Do you want to work in this folder?" prompt)
