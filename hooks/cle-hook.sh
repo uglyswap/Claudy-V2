@@ -1,8 +1,10 @@
 #!/bin/bash
 # Hook pour intercepter /cle-api et /cle AVANT le modele
 # Fonctionne SANS API - pur bash
+# Met a jour la clé API dans settings.json ET .claudy.json (5 emplacements)
 
 SETTINGS_PATH="$HOME/.claudy/settings.json"
+CLAUDE_JSON_PATH="$HOME/.claudy/.claudy.json"
 
 # Lire le prompt depuis stdin
 INPUT=$(cat)
@@ -34,9 +36,16 @@ if [[ "$PROMPT" =~ ^/(cle-api|cle)(\s+(.+))?$ ]]; then
         echo "Exemple:"
         echo "  /cle-api abc123def456.xyz789"
         echo ""
+        echo "La cle sera mise a jour dans:"
+        echo "  - settings.json (env.ANTHROPIC_AUTH_TOKEN)"
+        echo "  - .claudy.json (4 serveurs MCP)"
+        echo ""
         exit 2
     fi
 
+    # ============================================
+    # UPDATE settings.json
+    # ============================================
     # Verifier que settings.json existe
     if [ ! -f "$SETTINGS_PATH" ]; then
         echo "[ERREUR] settings.json introuvable"
@@ -51,16 +60,26 @@ if [[ "$PROMPT" =~ ^/(cle-api|cle)(\s+(.+))?$ ]]; then
         exit 2
     fi
 
-    # Compter les occurrences
-    COUNT=$(grep -o "$OLD_KEY" "$SETTINGS_PATH" | wc -l)
+    # Compter les occurrences dans settings.json
+    COUNT_SETTINGS=$(grep -o "$OLD_KEY" "$SETTINGS_PATH" | wc -l)
 
-    # Remplacer toutes les occurrences
+    # Remplacer dans settings.json
     sed -i "s|$OLD_KEY|$NEW_KEY|g" "$SETTINGS_PATH"
+
+    # ============================================
+    # UPDATE .claudy.json (4 MCP servers)
+    # ============================================
+    COUNT_CLAUDY=0
+    if [ -f "$CLAUDE_JSON_PATH" ]; then
+        COUNT_CLAUDY=$(grep -o "$OLD_KEY" "$CLAUDE_JSON_PATH" | wc -l)
+        sed -i "s|$OLD_KEY|$NEW_KEY|g" "$CLAUDE_JSON_PATH"
+    fi
 
     # Masquer les cles
     MASKED_OLD="${OLD_KEY:0:6}...${OLD_KEY: -4}"
     MASKED_NEW="${NEW_KEY:0:6}...${NEW_KEY: -4}"
 
+    # Afficher le resultat
     echo ""
     echo "========================================"
     echo "   CLE API Z.AI MISE A JOUR"
@@ -69,12 +88,16 @@ if [[ "$PROMPT" =~ ^/(cle-api|cle)(\s+(.+))?$ ]]; then
     echo "Ancienne: $MASKED_OLD"
     echo "Nouvelle: $MASKED_NEW"
     echo ""
-    echo "- ANTHROPIC_AUTH_TOKEN: OK"
-    echo "- Z_AI_API_KEY (vision): OK"
-    echo "- Authorization web-search-prime: OK"
-    echo "- Authorization web-reader: OK"
+    echo "- settings.json (env.ANTHROPIC_AUTH_TOKEN): OK"
+    echo "- .claudy.json (zai-vision): OK"
+    echo "- .claudy.json (web-search-prime): OK"
+    echo "- .claudy.json (web-reader): OK"
+    echo "- .claudy.json (zread): OK"
     echo ""
-    echo "$COUNT occurrence(s) remplacee(s)"
+    TOTAL_COUNT=$((COUNT_SETTINGS + COUNT_CLAUDY))
+    echo "$TOTAL_COUNT occurrence(s) remplacee(s)"
+    echo "  - settings.json: $COUNT_SETTINGS"
+    echo "  - .claudy.json: $COUNT_CLAUDY"
     echo ""
     echo "Redemarrez Claudy pour appliquer."
     echo ""
