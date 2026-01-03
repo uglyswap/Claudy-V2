@@ -29,27 +29,7 @@ function Claudy-Logo {
     )
 
     # ═══════════════════════════════════════════════════════════════════════
-        # ═══════════════════════════════════════════════════════════════════════
-    # 🖥️ DÉTECTION TERMINAL : CMD vs PowerShell
-    # ═══════════════════════════════════════════════════════════════════════
-    # Détecte si on est lancé depuis CMD (animation OK) ou PowerShell direct (animation désactivée)
-    $launchedFromCmd = $false
-    try {
-        $parentProcess = (Get-Process -Id $PID).Parent.ProcessName
-        if ($parentProcess -eq 'cmd') {
-            $launchedFromCmd = $true
-        }
-    } catch {
-        # Si la détection échoue, on assume PowerShell direct (sans animation)
-    }
-    
-    # Si lancé depuis PowerShell direct (pas CMD), désactiver l'animation par défaut
-    if (-not $launchedFromCmd) {
-        $NoAnimation = $true
-    }
-
-
-    # 
+    # 🕶️ STEALTH MODE CHECK
     # ═══════════════════════════════════════════════════════════════════════
     if ($NoLogo -or $script:CLAUDY_STEALTH_MODE) {
         return
