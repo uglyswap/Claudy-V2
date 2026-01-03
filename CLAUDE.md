@@ -181,3 +181,352 @@ Before coding, understand context and commit to a BOLD aesthetic direction:
 **No design should be the same.** Vary between light/dark themes, different fonts, different aesthetics. NEVER converge on common choices.
 
 **Match complexity to vision:** Maximalist designs need elaborate code. Minimalist designs need restraint and precision. Elegance comes from executing the vision well.
+
+## 9. Context7
+- Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+
+---
+
+## 10. BACKEND PATTERNS (CHECKLIST)
+
+### API Design
+- REST vs GraphQL vs tRPC: REST=standard, GraphQL=complex queries, tRPC=fullstack type safety
+- API versioning: /api/v1/ (NEVER break existing endpoints)
+- Rate limiting: user-based (auth), IP-based (public), tiered (plans)
+- Pagination: cursor-based (infinite), offset-based (simple)
+- Errors: RFC 7807 format, {error: string, code: string, details: any}
+
+### Database Rules
+- SQL first, NoSQL if: unstructured data, massive scale, document-heavy
+- Normalize until 3NF, denormalize for read-heavy (measure first!)
+- Index: foreign keys, filtered columns, composite for queries
+- Migrations first: change schema → run migration → update code
+- Connection pooling: Supabase/Postgres handles, know your limits
+
+### Authentication Decision Tree
+```
+Simple app → Supabase Auth / Clerk (batteries included)
+Custom needs → NextAuth.js / Lucia (flexible)
+Enterprise → OAuth2/OIDC provider (Auth0, Okta)
+Multi-tenant → Row-Level Security (Supabase RLS)
+```
+- Sessions = JWT httpOnly cookies + refresh token rotation
+- Passwords: argon2id > bcrypt > scrypt (NEVER md5/sha)
+- MFA: TOTP (authenticator apps) > WebAuthn > SMS
+
+---
+
+## 11. SECURITY NON-NEGOTIABLES
+
+### OWASP Top 10 Checklist
+- [ ] **Injection**: Parameterized queries ONLY, ORM by default
+- [ ] **Broken Auth**: Secure sessions, short expiry, https-only
+- [ ] **XSS**: CSP headers, sanitize HTML (DOMPurify), escape output
+- [ ] **CSRF**: SameSite cookies, CSRF tokens for state-changing
+- [ ] **SSRF**: Validate URLs, allowlist domains, no internal calls
+- [ ] **Security Misconfiguration**: Default deny, change secrets
+
+### Input Validation Pyramid
+```
+Boundary 1: Frontend (UX, NOT security)
+Boundary 2: API (Zod/schema validation)
+Boundary 3: Database (constraints, types)
+Boundary 4: Business logic (authorization checks)
+```
+
+### Secrets Management
+- NEVER commit .env files (gitignore + git-secrets)
+- Rotate keys regularly (90 days max for production)
+- Use environment-specific secrets (dev/staging/prod)
+- Log scrubbing: redact passwords, tokens, PII
+
+---
+
+## 12. TESTING PYRAMID (NOT OPTIONAL)
+
+### Test Structure
+```
+tests/
+├── unit/        # Fast, isolated, mock everything
+├── integration/ # Database/API, Testcontainers
+└── e2e/         # Playwright, critical journeys ONLY
+```
+
+### Coverage Targets
+- Unit: 80%+ on business logic
+- Integration: All API endpoints, critical paths
+- E2E: Happy path + 2-3 edge cases per feature
+
+### When to Test What
+- **Unit**: Pure functions, business rules, utilities
+- **Integration**: Database queries, API calls, services
+- **E2E**: User flows (login, checkout, CRUD)
+
+### TDD Workflow (Use for complex logic)
+1. Write failing test
+2. Write minimal code to pass
+3. Refactor
+4. Repeat
+
+### Tools
+- Unit: Vitest (fastest), Jest
+- Integration: Supertest, Testcontainers
+- E2E: Playwright (recommended), Cypress
+
+---
+
+## 13. PERFORMANCE BASELINES
+
+### Core Web Vitals Targets
+- LCP (Largest Contentful Paint): < 2.5s
+- FID (First Input Delay): < 100ms
+- CLS (Cumulative Layout Shift): < 0.1
+
+### Frontend Optimization
+- Code splitting: route-based (automatic Next.js), component-based (React.lazy)
+- Images: WebP/AVIF, srcset, loading="lazy", priority for above-fold
+- Fonts: font-display: swap, subset, preload critical
+- Bundle analysis: @next/bundle-analyzer, remove unused deps
+
+### Backend Optimization
+- EXPLAIN ANALYZE slow queries, add indexes
+- Cache: Redis/Upstash for hot data, CDN for static
+- Connection pooling: PgBouncer for high concurrency
+- Background jobs: BullMQ, Inngest for heavy tasks
+
+### Monitoring
+- Error tracking: Sentry (free tier sufficient)
+- APM: Vercel Analytics, DataDog (production)
+- RUM: Web Vitals, user feedback
+
+---
+
+## 14. NEXT.JS 15/16 ESSENTIALS
+
+### Server vs Client Components
+```typescript
+'use server'  // Server Actions, database, secrets
+'use client' // Interactive (onClick, useState, useEffect)
+```
+- Server by default (faster, secure, smaller bundle)
+- Client only when: browser APIs, event listeners, React hooks
+
+### Server Actions Pattern
+```typescript
+'use server'
+export async function createAction(formData: FormData) {
+  const data = schema.parse(Object.fromEntries(formData))
+  await db.create(data)
+  revalidatePath('/route')
+  redirect('/success')
+}
+```
+- Validate with Zod FIRST
+- Always revalidate/redirect after mutation
+- Return { error, success } for partial updates
+
+### Caching Strategy
+- fetch() with next.revalidate (seconds)
+- revalidatePath() after mutations
+- unstable_cache() for expensive computations
+- cacheTag() for granular invalidation
+
+---
+
+## 15. STATE MANAGEMENT DECISION TREE
+
+```
+1. URL state? → search params (useSearchParams)
+2. Server data? → Server Components (no fetch)
+3. Cached server data? → React Query / SWR
+4. Form state? → React Hook Form + Zod
+5. Global UI state? → Zustand / Jotai (RARELY needed)
+6. Local UI state? → useState / useReducer
+```
+
+### React Query Patterns
+- staleTime: 0 (real-time) to 5min (rarely changing)
+- gcTime: 5min to 1hour (keep in background)
+- Optimistic updates for instant feedback
+- InfiniteQuery for lists/pagination
+
+---
+
+## 16. DEVOPS CHECKLIST
+
+### CI/CD Pipeline (Every PR)
+```yaml
+- Lint: ESLint + TypeScript check
+- Test: Unit + Integration
+- Build: Production build success
+- Deploy: Preview URL (Vercel/Railway)
+```
+
+### Pre-commit Hooks (Husky + lint-staged)
+```json
+{
+  "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+  "*.{json,md}": ["prettier --write"]
+}
+```
+
+### Environments
+- .env.local (gitignored, local dev)
+- .env.development (dev server)
+- .env.production (build-time)
+- NEVER commit secrets
+
+### Deployment Strategy
+- Preview: Every PR (Vercel automatic)
+- Staging: Test main branch before production
+- Production: Main branch, auto-deploy
+- Rollback: git revert or Vercel rollback button
+
+---
+
+## 17. WORKFLOW PATTERNS
+
+### Building a Feature (Step-by-Step)
+1. **Define**: Types + Zod schema (contract first)
+2. **Database**: Migration with proper indexes
+3. **Backend**: Server Action with validation
+4. **Frontend**: UI integrating action
+5. **Test**: Unit logic, integration API
+6. **Performance**: Bundle size, query check
+7. **Security**: Auth check, input validation
+
+### Debugging Complex Bugs
+1. Reproduce reliably (document steps)
+2. Isolate minimal repro (remove noise)
+3. Hypothesize (list 3 causes, rank by probability)
+4. Test one variable at a time
+5. Fix + add regression test
+6. Document root cause
+
+### Performance Regression
+1. Baseline: Lighthouse + EXPLAIN ANALYZE
+2. Profile: webpack-bundle-analyzer + DB logs
+3. Fix biggest bottleneck first (Pareto principle)
+4. Verify: Compare to baseline
+5. Document: Add comment with before/after metrics
+
+---
+
+## 18. TECH STACK CHOICE MATRIX
+
+### Project Type → Recommended Stack
+| Type | Framework | Database | Auth | Deploy |
+|------|-----------|----------|------|--------|
+| SaaS MVP | Next.js | Supabase | Clerk | Vercel |
+| E-commerce | Next.js | Postgres | NextAuth | Vercel |
+| Dashboard | Next.js | Postgres | Custom | Vercel |
+| API-only | Hono | Postgres | JWT | Railway |
+| Mobile+Web | Expo/Next | Supabase | Supabase | Expo/Vercel |
+
+### When to Choose What
+- **Next.js**: Need SEO, server rendering, fullstack TypeScript
+- **Remix**: Better forms, progressive enhancement focus
+- **SvelteKit**: Maximum performance, smaller bundle
+- **Nuxt**: Vue ecosystem preferred
+- **Hono**: Edge functions, API-only, fastest
+
+---
+
+## 19. CODE QUALITY GATES
+
+### TypeScript Strict Config (tsconfig.json)
+```json
+{
+  "strict": true,
+  "noUncheckedIndexedAccess": true,
+  "noImplicitReturns": true,
+  "noFallthroughCasesInSwitch": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true
+}
+```
+
+### PR Review Checklist
+- [ ] Types correct (no `any`, proper typing)
+- [ ] Error handling (try/catch, user feedback)
+- [ ] Input validation (Zod schemas)
+- [ ] Security checks (auth, injection, rate limits)
+- [ ] Tests added/updated
+- [ ] Performance OK (no N+1, indexes)
+- [ ] Documentation if complex logic
+
+### Linting Standards
+- ESLint: typescript-eslint + eslint-plugin-react + next
+- Prettier: Formatting consistency
+- Complexity: Cyclomatic < 10 per function
+- Import order: External, internal, relative (auto-group)
+
+---
+
+## 20. ARCHITECTURE PRINCIPLES
+
+### Design Patterns to Know
+- **Repository**: Data access abstraction
+- **Service**: Business logic layer
+- **Factory/Builder**: Complex object creation
+- **Strategy**: Interchangeable algorithms
+- **Observer/Pub-Sub**: Event-driven updates
+
+### Architectural Rules
+- Monolith first, microservices NEVER (unless proven need)
+- Event-driven: Use message queues for background tasks
+- CQRS: Separate read/write models for complex domains
+- Clean Architecture: Domain → Application → Infrastructure → Presentation
+
+### When to Add Complexity
+```
+Team size > 5? → Consider service separation
+Domain complexity high? → DDD, bounded contexts
+Scale > 100k users? → Caching, CDN, horizontal scaling
+```
+
+---
+
+## 21. CRITICAL: ALWAYS DO THIS
+
+### Before Writing Code
+- [ ] Read existing code (patterns, conventions)
+- [ ] Check if library/tool exists (don't reinvent)
+- [ ] Define TypeScript types first
+- [ ] Consider edge cases (null, empty, errors)
+
+### After Writing Code
+- [ ] Type check passes (tsc --noEmit)
+- [ ] Linter passes (eslint .)
+- [ ] Tests pass locally
+- [ ] Manual smoke test (happy path)
+- [ ] Performance OK (no obvious regressions)
+
+### Before Committing
+- [ ] Commit message: `type(scope): description`
+- [ ] Types: feat, fix, refactor, perf, test, docs, chore
+- [ ] Add co-author if AI-assisted
+- [ ] NEVER commit: .env, node_modules, build artifacts
+
+---
+
+## 22. EMERGENCY REFERENCE
+
+### Common Issues → Quick Fixes
+```
+Type errors? → Check imports, restart TS server
+Slow build? → Check bundle size, remove unused deps
+Failing tests? → Run with --verbose for details
+Deploy fails? → Check build logs, env variables
+DB slow? → EXPLAIN ANALYZE, add index
+```
+
+### Get Help Command
+- Context7: Library docs, best practices
+- Web Search: Current trends, error solutions
+- GitHub repo search: Real-world examples
+- AKHITHINK: Deep analysis for complex problems
+
+---
+
+**Remember: The best code is code that doesn't exist. Delete before adding. Simplify before optimizing. Ship before perfecting.**
