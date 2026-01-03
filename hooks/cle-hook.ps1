@@ -1,10 +1,12 @@
 #!/usr/bin/env pwsh
 # Hook pour intercepter /cle-api et /cle AVANT le modele
 # Fonctionne SANS API - pur PowerShell
+# Met a jour la clé API dans settings.json ET .claudy.json (5 emplacements)
 
 param()
 
 $settingsPath = Join-Path $env:USERPROFILE ".claudy\settings.json"
+$claudyJsonPath = Join-Path $env:USERPROFILE ".claudy\.claudy.json"
 
 # Lire le prompt depuis stdin (format JSON de Claude Code)
 $inputJson = $input | Out-String
@@ -40,12 +42,18 @@ if ($prompt -match "^/(cle-api|cle)(\s+(.+))?$") {
         Write-Host "Exemple:" -ForegroundColor Gray
         Write-Host "  /cle-api abc123def456.xyz789" -ForegroundColor White
         Write-Host ""
+        Write-Host "La cle sera mise a jour dans:" -ForegroundColor Gray
+        Write-Host "  - settings.json (env.ANTHROPIC_AUTH_TOKEN)" -ForegroundColor Gray
+        Write-Host "  - .claudy.json (4 serveurs MCP)" -ForegroundColor Gray
+        Write-Host ""
         exit 2  # Bloquer - ne pas envoyer au modele
     }
 
     $newKey = $newKey.Trim()
 
-    # Lire settings.json
+    # ============================================
+    # UPDATE settings.json
+    # ============================================
     if (-not (Test-Path $settingsPath)) {
         Write-Host "[ERREUR] settings.json introuvable" -ForegroundColor Red
         exit 2
@@ -65,18 +73,32 @@ if ($prompt -match "^/(cle-api|cle)(\s+(.+))?$") {
         exit 2
     }
 
-    # Compter les occurrences
-    $countBefore = ([regex]::Matches($content, [regex]::Escape($oldKey))).Count
+    # Compter les occurrences dans settings.json
+    $countSettings = ([regex]::Matches($content, [regex]::Escape($oldKey))).Count
 
-    # Remplacer toutes les occurrences
-    $newContent = $content -replace [regex]::Escape($oldKey), $newKey
-
-    # Ecrire le fichier
+    # Remplacer dans settings.json
     try {
+        $newContent = $content -replace [regex]::Escape($oldKey), $newKey
         [System.IO.File]::WriteAllText($settingsPath, $newContent, [System.Text.UTF8Encoding]::new($true))
     } catch {
         Write-Host "[ERREUR] Impossible d'ecrire settings.json" -ForegroundColor Red
         exit 2
+    }
+
+    # ============================================
+    # UPDATE .claudy.json (4 MCP servers)
+    # ============================================
+    $countClaudy = 0
+    if (Test-Path $claudyJsonPath) {
+        try {
+            $claudyContent = Get-Content $claudyJsonPath -Raw -Encoding UTF8
+            $countClaudy = ([regex]::Matches($claudyContent, [regex]::Escape($oldKey))).Count
+            
+            $newClaudyContent = $claudyContent -replace [regex]::Escape($oldKey), $newKey
+            [System.IO.File]::WriteAllText($claudyJsonPath, $newClaudyContent, [System.Text.UTF8Encoding]::new($true))
+        } catch {
+            Write-Host "[WARN] Impossible de mettre a jour .claudy.json" -ForegroundColor Yellow
+        }
     }
 
     # Masquer les cles pour l'affichage
@@ -92,12 +114,16 @@ if ($prompt -match "^/(cle-api|cle)(\s+(.+))?$") {
     Write-Host "Ancienne: $maskedOld" -ForegroundColor Gray
     Write-Host "Nouvelle: $maskedNew" -ForegroundColor White
     Write-Host ""
-    Write-Host "- ANTHROPIC_AUTH_TOKEN: OK" -ForegroundColor Green
-    Write-Host "- Z_AI_API_KEY (vision): OK" -ForegroundColor Green
-    Write-Host "- Authorization web-search-prime: OK" -ForegroundColor Green
-    Write-Host "- Authorization web-reader: OK" -ForegroundColor Green
+    Write-Host "- settings.json (env.ANTHROPIC_AUTH_TOKEN): OK" -ForegroundColor Green
+    Write-Host "- .claudy.json (zai-vision): OK" -ForegroundColor Green
+    Write-Host "- .claudy.json (web-search-prime): OK" -ForegroundColor Green
+    Write-Host "- .claudy.json (web-reader): OK" -ForegroundColor Green
+    Write-Host "- .claudy.json (zread): OK" -ForegroundColor Green
     Write-Host ""
-    Write-Host "$countBefore occurrence(s) remplacee(s)" -ForegroundColor Cyan
+    $totalCount = $countSettings + $countClaudy
+    Write-Host "$totalCount occurrence(s) remplacee(s)" -ForegroundColor Cyan
+    Write-Host "  - settings.json: $countSettings" -ForegroundColor Gray
+    Write-Host "  - .claudy.json: $countClaudy" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Redemarrez Claudy pour appliquer." -ForegroundColor Yellow
     Write-Host ""
