@@ -140,7 +140,7 @@ finally {
 
 # Download and install Claudy-Logo module (for wrapper animation)
 Write-Host "Installation du module Claudy-Logo..." -ForegroundColor Yellow
-$logoModuleUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/Claudy-Logo.psm1"
+$logoModuleUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/modules/Claudy-Logo.psm1"
 $logoModulePath = Join-Path $claudyModulesDir "Claudy-Logo.psm1"
 try {
     Invoke-WebRequest -Uri $logoModuleUrl -OutFile $logoModulePath -UseBasicParsing
@@ -154,7 +154,7 @@ try {
 # ============================================
 Write-Host "Installation des hooks Claudy..." -ForegroundColor Yellow
 
-$cleHookUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/hooks/cle-hook.ps1"
+$cleHookUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/hooks/cle-hook.ps1"
 $cleHookPath = Join-Path $claudyHooksDir "cle-hook.ps1"
 try {
     Invoke-WebRequest -Uri $cleHookUrl -OutFile $cleHookPath -UseBasicParsing
@@ -168,7 +168,7 @@ try {
 # ============================================
 Write-Host "Installation du handler /cle-api..." -ForegroundColor Yellow
 
-$cleHandlerUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/lib/cle-api-handler.js"
+$cleHandlerUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/lib/cle-api-handler.js"
 $cleHandlerPath = Join-Path $claudyLibDir "cle-api-handler.js"
 try {
     Invoke-WebRequest -Uri $cleHandlerUrl -OutFile $cleHandlerPath -UseBasicParsing
@@ -183,7 +183,7 @@ try {
 Write-Host "Telechargement des scripts Claudy..." -ForegroundColor Yellow
 
 # Download claudy.ps1 (main wrapper with API key validation)
-$claudyPs1Url = "https://raw.githubusercontent.com/uglyswap/Claudy/main/bin/claudy.ps1"
+$claudyPs1Url = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/bin/claudy.ps1"
 $claudyPs1Path = Join-Path $claudyBinDir "claudy.ps1"
 try {
     Invoke-WebRequest -Uri $claudyPs1Url -OutFile $claudyPs1Path -UseBasicParsing
@@ -358,7 +358,7 @@ Write-Host "[OK] 3 serveurs MCP configures" -ForegroundColor Green
 
 # Download CLAUDE.md from GitHub
 $claudeMdPath = Join-Path $claudyDir "CLAUDE.md"
-$claudeMdUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/CLAUDE.md"
+$claudeMdUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/CLAUDE.md"
 
 try {
     Invoke-WebRequest -Uri $claudeMdUrl -OutFile $claudeMdPath -UseBasicParsing
