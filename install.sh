@@ -134,16 +134,11 @@ curl -fsSL "$LOGO_SCRIPT_URL" -o "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 chmod +x "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 echo -e "${GREEN}[OK] Logo anime installe${NC}"
 
-# Download MCP sync script
-echo -e "${YELLOW}Installation du script de synchronisation MCP...${NC}"
-SYNC_MCP_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
-SYNC_MCP_PATH="$CLAUDY_BIN_DIR/sync-mcp.js"
-curl -fsSL "$SYNC_MCP_URL" -o "$SYNC_MCP_PATH" 2>/dev/null || true
-echo -e "${GREEN}[OK] Script sync-mcp.js installe${NC}"
-
 # ============================================
 # CREATE CLAUDY WRAPPER SCRIPT WITH API KEY VALIDATION
 # ============================================
+echo -e "${YELLOW}Creation du wrapper Claudy...${NC}"
+
 CLAUDY_WRAPPER_PATH="$CLAUDY_BIN_DIR/claudy"
 cat > "$CLAUDY_WRAPPER_PATH" << 'WRAPPER'
 #!/bin/bash
@@ -160,6 +155,7 @@ CLAUDY_DIR="$HOME/.claudy"
 CLAUDY_LIB_DIR="$CLAUDY_DIR/lib"
 LOGO_SCRIPT="$CLAUDY_DIR/bin/claudy-logo.sh"
 SETTINGS_PATH="$CLAUDY_DIR/settings.json"
+CLAUDE_JSON_PATH="$CLAUDY_DIR/.claudy.json"
 
 # Check for --no-logo or -n flag
 SHOW_LOGO=true
@@ -208,13 +204,19 @@ update_api_key() {
     local new_key="$1"
     local old_key="$2"
     
+    # Update settings.json
     if [ -f "$SETTINGS_PATH" ]; then
-        # Use sed to replace all occurrences
         sed -i.bak "s|$old_key|$new_key|g" "$SETTINGS_PATH"
         rm -f "${SETTINGS_PATH}.bak"
-        return 0
     fi
-    return 1
+    
+    # Update .claudy.json (5 locations in MCP servers)
+    if [ -f "$CLAUDE_JSON_PATH" ]; then
+        sed -i.bak "s|$old_key|$new_key|g" "$CLAUDE_JSON_PATH"
+        rm -f "${CLAUDE_JSON_PATH}.bak"
+    fi
+    
+    return 0
 }
 
 prompt_for_new_key() {
@@ -291,11 +293,11 @@ if [ "$KEY_NEEDS_UPDATE" = true ]; then
         
         if update_api_key "$NEW_KEY" "$OLD_KEY_TO_REPLACE"; then
             echo ""
-            echo -e "\033[0;32m[OK] Cle API mise a jour dans les 4 emplacements\033[0m"
+            echo -e "\033[0;32m[OK] Cle API mise a jour dans les 5 emplacements\033[0m"
             echo ""
             API_KEY="$NEW_KEY"
         else
-            echo -e "\033[0;31m[ERREUR] Impossible de mettre a jour settings.json\033[0m"
+            echo -e "\033[0;31m[ERREUR] Impossible de mettre a jour les fichiers de configuration\033[0m"
             exit 1
         fi
     else
@@ -305,14 +307,6 @@ if [ "$KEY_NEEDS_UPDATE" = true ]; then
 fi
 
 
-# ============================================
-# SYNC MCP SERVERS FROM settings.json TO .claudy.json
-# ============================================
-
-SYNC_MCP_SCRIPT="$CLAUDY_DIR/bin/sync-mcp.js"
-if [ -f "$SYNC_MCP_SCRIPT" ]; then
-    node "$SYNC_MCP_SCRIPT" 2>/dev/null || true
-fi
 # ============================================
 # EXPORT ENVIRONMENT VARIABLES
 # ============================================
@@ -327,10 +321,10 @@ try:
         settings = json.load(f)
     env_vars = settings.get('env', {})
     for key, value in env_vars.items():
-        escaped_value = str(value).replace(\"'\", \"'\\\"'\\\"'\")
+        escaped_value = str(value).replace(\"'\", \"'\\\\\\\"'\\\\\\\"'\")
         print(f\"export {key}='{escaped_value}'\")
 except Exception as e:
-    sys.stderr.write(f'Warning: Could not parse settings.json: {e}\\n')
+    sys.stderr.write(f'Warning: Could not parse settings.json: {e}\\\\n')
 " 2>/dev/null)
     elif command -v python &> /dev/null; then
         eval $(python -c "
@@ -341,10 +335,10 @@ try:
         settings = json.load(f)
     env_vars = settings.get('env', {})
     for key, value in env_vars.items():
-        escaped_value = str(value).replace(\"'\", \"'\\\"'\\\"'\")
+        escaped_value = str(value).replace(\"'\", \"'\\\\\\\"'\\\\\\\"'\")
         print('export {}=\\'{}\\''.format(key, escaped_value))
 except Exception as e:
-    sys.stderr.write('Warning: Could not parse settings.json: {}\\n'.format(e))
+    sys.stderr.write('Warning: Could not parse settings.json: {}\\\\n'.format(e))
 " 2>/dev/null)
     fi
 fi
@@ -378,15 +372,6 @@ fi
 # Fallback to cli.js if cli-claudy.js still doesn't exist
 if [ ! -f "$CLAUDY_EXE" ]; then
     CLAUDY_EXE="$CLAUDY_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli.js"
-fi
-
-
-# ============================================
-# SYNC MCP SERVERS FROM settings.json TO .claudy.json
-# ============================================
-SYNC_MCP_SCRIPT="$CLAUDY_DIR/bin/sync-mcp.js"
-if [ -f "$SYNC_MCP_SCRIPT" ]; then
-    node "$SYNC_MCP_SCRIPT" 2>/dev/null || true
 fi
  
 if [ -f "$CLAUDY_EXE" ]; then
@@ -459,6 +444,7 @@ echo -n "Entrez votre cle API Z.AI (ou appuyez sur Entree pour configurer plus t
 read API_KEY
 
 SETTINGS_PATH="$CLAUDY_DIR/settings.json"
+CLAUDE_JSON_PATH="$CLAUDY_DIR/.claudy.json"
 
 KEY_CONFIGURED=true
 if [ -z "$API_KEY" ]; then
@@ -469,8 +455,9 @@ if [ -z "$API_KEY" ]; then
     echo -e "${YELLOW}       Au demarrage de Claudy, il vous demandera votre cle.${NC}"
 fi
 
-# Create settings.json with GLM config, MCP servers, bypass permissions
-# NOTE: No hooks - /cle-api is now a native command injected in cli-claudy.js
+# ============================================
+# CREATE settings.json WITH ENV ONLY (NO MCP SERVERS)
+# ============================================
 cat > "$SETTINGS_PATH" << EOF
 {
   "permissionMode": "bypassPermissions",
@@ -488,42 +475,84 @@ cat > "$SETTINGS_PATH" << EOF
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.7",
     "DISABLE_AUTOUPDATER": "1"
-  },
-  "mcpServers": {
-    "zai-vision": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@z_ai/mcp-server"],
-      "env": {
-        "Z_AI_API_KEY": "$API_KEY",
-        "Z_AI_MODE": "ZAI"
-      }
-    },
-    "web-search-prime": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      "headers": {
-        "Authorization": "Bearer $API_KEY"
-      }
-    },
-    "web-reader": {
-      "type": "http",
-      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
-      "headers": {
-        "Authorization": "Bearer $API_KEY"
-      }
-    }
   }
 }
 EOF
 
-echo -e "${GREEN}[OK] Configuration GLM 4.7 creee${NC}"
+echo -e "${GREEN}[OK] Configuration GLM 4.7 creee (settings.json)${NC}"
 echo -e "${GREEN}[OK] Mode bypass permissions active${NC}"
 echo -e "${GREEN}[OK] Auto-updater desactive${NC}"
-echo -e "${GREEN}[OK] 3 serveurs MCP configures${NC}"
 
 # ============================================
-# DOWNLOAD CLAUDE.MD FROM GITHUB
+# CREATE .claudy.json WITH MCP SERVERS DIRECTLY
+# ============================================
+HOME_DIR_KEY="$HOME"
+CLAUDE_JSON_CONTENT=$(cat << CLAUDEEOF
+{
+  "projects": {
+    "$HOME_DIR_KEY": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {
+        "zai-vision": {
+          "type": "stdio",
+          "command": "npx",
+          "args": ["-y", "@z_ai/mcp-server"],
+          "env": {
+            "Z_AI_API_KEY": "$API_KEY",
+            "Z_AI_MODE": "ZAI"
+          }
+        },
+        "web-search-prime": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+          "headers": {
+            "Authorization": "Bearer $API_KEY"
+          }
+        },
+        "web-reader": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+          "headers": {
+            "Authorization": "Bearer $API_KEY"
+          }
+        },
+        "zread": {
+          "type": "http",
+          "url": "https://api.z.ai/api/mcp/zread/mcp",
+          "headers": {
+            "Authorization": "Bearer $API_KEY"
+          }
+        }
+      },
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "hasCompletedProjectOnboarding": true
+    }
+  }
+}
+CLAUDEEOF
+)
+
+echo "$CLAUDE_JSON_CONTENT" > "$CLAUDE_JSON_PATH"
+
+echo -e "${GREEN}[OK] 4 serveurs MCP configures dans .claudy.json${NC}"
+echo -e "${GREEN}[OK] Nouveau serveur 'zread' ajoute${NC}"
+
+# ============================================
+# DOWNLOAD CLAUDE.md FROM GITHUB
 # ============================================
 echo -e "${YELLOW}Installation du system prompt...${NC}"
 
@@ -562,6 +591,7 @@ echo -e "${WHITE}Claudy est 100% independant de Claude Code :${NC}"
 echo -e "${GRAY}  - Installation isolee : ~/.claudy/lib/${NC}"
 echo -e "${GRAY}  - CLI patche : cli-claudy.js (pas cli.js)${NC}"
 echo -e "${GRAY}  - Configuration isolee : ~/.claudy/settings.json${NC}"
+echo -e "${GRAY}  - MCP servers dans : ~/.claudy/.claudy.json${NC}"
 echo -e "${GRAY}  - Binaires isoles : ~/.claudy/bin/${NC}"
 echo ""
 echo -e "${WHITE}Claude Code (officiel) reste intact :${NC}"
@@ -575,6 +605,7 @@ echo -e "${GREEN}  - GLM 4.7 (pas besoin de compte Anthropic)${NC}"
 echo -e "${GREEN}  - Vision IA (images, videos, OCR)${NC}"
 echo -e "${GREEN}  - Recherche web${NC}"
 echo -e "${GREEN}  - Lecture de pages web${NC}"
+echo -e "${GREEN}  - Lecture de fichiers distants (zread)${NC}"
 echo -e "${GREEN}  - Mode sans permissions (pas de confirmations)${NC}"
 echo -e "${GREEN}  - Version figee ${CLAUDE_CODE_VERSION} (pas de mises a jour auto)${NC}"
 echo -e "${MAGENTA}  - AKHITHINK: Deep reasoning mode${NC}"
@@ -585,6 +616,7 @@ echo -e "${GRAY}Structure d'installation :${NC}"
 echo -e "${GRAY}  ~/.claudy/${NC}"
 echo -e "${GRAY}    +-- bin/           (claudy)${NC}"
 echo -e "${GRAY}    +-- lib/           (node_modules avec cli-claudy.js)${NC}"
-echo -e "${GRAY}    +-- settings.json  (configuration)${NC}"
+echo -e "${GRAY}    +-- settings.json  (configuration env uniquement)${NC}"
+echo -e "${GRAY}    +-- .claudy.json   (MCP servers + projets)${NC}"
 echo -e "${GRAY}    +-- CLAUDE.md      (system prompt)${NC}"
 echo ""
