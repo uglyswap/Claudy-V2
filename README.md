@@ -230,8 +230,13 @@ Ces serveurs sont automatiquement configurés pendant l'installation :
 | **zai-vision** | Analyse d'images, vidéos, OCR, interprétation de diagrammes |
 | **web-search-prime** | Recherche web en temps réel |
 | **web-reader** | Lecture et extraction de contenu de pages web |
+| **zread** | Recherche de documentation GitHub, structure de repo, lecture de fichiers distants |
 
 Tous utilisent votre clé API Z.AI. Rien à configurer.
+
+Les MCP servers sont configurés dans deux fichiers :
+- `~/.claudy/settings.json` - Configuration principale
+- `~/.claudy/.claude.json` - Configuration pour la commande `/mcp`
 
 ---
 
@@ -345,6 +350,7 @@ rm -rf ~/.claude
 ├── modules/
 │   └── Claudy-Logo.psm1 # Module PowerShell pour le logo
 ├── settings.json        # Configuration (API, MCP servers, hooks)
+├── .claude.json         # Configuration MCP servers pour /mcp
 └── CLAUDE.md            # System prompt personnalisé (Claudy Focan)
 ```
 

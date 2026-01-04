@@ -116,12 +116,10 @@ LOGO_SCRIPT_PATH="$CLAUDY_BIN_DIR/claudy-logo.sh"
 curl -fsSL "$LOGO_SCRIPT_URL" -o "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 chmod +x "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 echo -e "${GREEN}[OK] Logo anime installe${NC}"
-# Download MCP sync script
-echo -e "${YELLOW}Installation du script de synchronisation MCP...${NC}"
-SYNC_MCP_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
-SYNC_MCP_PATH="$CLAUDY_BIN_DIR/sync-mcp.js"
-curl -fsSL "$SYNC_MCP_URL" -o "$SYNC_MCP_PATH" 2>/dev/null || true
-echo -e "${GREEN}[OK] Script sync-mcp.js installe${NC}"
+
+# NOTE: sync-mcp.js is no longer needed - MCP servers are now directly in .claude.json
+echo -e "${GRAY}[INFO] MCP servers will be configured directly in .claude.json${NC}"
+
 # ============================================
 # CREATE CLAUDY WRAPPER SCRIPT WITH API KEY VALIDATION
 # ============================================
@@ -263,13 +261,7 @@ if [ "$KEY_NEEDS_UPDATE" = true ]; then
         exit 1
     fi
 fi
-# ============================================
-# SYNC MCP SERVERS FROM settings.json TO .claudy.json
-# ============================================
-SYNC_MCP_SCRIPT="$CLAUDY_DIR/bin/sync-mcp.js"
-if [ -f "$SYNC_MCP_SCRIPT" ]; then
-    node "$SYNC_MCP_SCRIPT" 2>/dev/null || true
-fi
+
 # ============================================
 # EXPORT ENVIRONMENT VARIABLES
 # ============================================
@@ -455,6 +447,13 @@ cat > "$SETTINGS_PATH" << EOF
 "headers": {
 "Authorization": "Bearer $API_KEY"
 }
+},
+"zread": {
+"type": "http",
+"url": "https://api.z.ai/api/mcp/zread/mcp",
+"headers": {
+"Authorization": "Bearer $API_KEY"
+}
 }
 }
 }
@@ -462,8 +461,50 @@ EOF
 echo -e "${GREEN}[OK] Configuration GLM 4.7 creee${NC}"
 echo -e "${GREEN}[OK] Mode bypass permissions active${NC}"
 echo -e "${GREEN}[OK] Auto-updater desactive${NC}"
-echo -e "${GREEN}[OK] 3 serveurs MCP configures${NC}"
+echo -e "${GREEN}[OK] 4 serveurs MCP configures${NC}"
 echo -e "${GREEN}[OK] CLAUDE_CODE_MAX_OUTPUT_TOKENS = 200000${NC}"
+
+# Create .claude.json with MCP servers directly configured
+# This ensures MCP servers appear in /mcp command without needing sync script
+CLAUDE_JSON_PATH="$CLAUDY_DIR/.claude.json"
+cat > "$CLAUDE_JSON_PATH" << EOF
+{
+  "mcpServers": {
+    "zai-vision": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@z_ai/mcp-server"],
+      "env": {
+        "Z_AI_API_KEY": "$API_KEY",
+        "Z_AI_MODE": "ZAI"
+      }
+    },
+    "web-search-prime": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
+    },
+    "web-reader": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
+    },
+    "zread": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer $API_KEY"
+      }
+    }
+  }
+}
+EOF
+
+echo -e "${GREEN}[OK] .claude.json cree avec MCP servers${NC}"
 # ============================================
 # DOWNLOAD CLAUDE.MD FROM GITHUB
 # ============================================

@@ -165,15 +165,7 @@ try {
 } catch {
     Write-Host "[WARN] Impossible de telecharger claudy.ps1" -ForegroundColor Yellow
 }
-# Download sync-mcp.js
-$syncMcpUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/sync-mcp.js"
-$syncMcpPath = Join-Path $claudyBinDir "sync-mcp.js"
-try {
-    Invoke-WebRequest -Uri $syncMcpUrl -OutFile $syncMcpPath -UseBasicParsing
-    Write-Host "[OK] sync-mcp.js telecharge" -ForegroundColor Green
-} catch {
-    Write-Host "[WARN] Impossible de telecharger sync-mcp.js" -ForegroundColor Yellow
-}
+# NOTE: sync-mcp.js is no longer needed - MCP servers are now directly in .claude.json
 # Create batch file in ~/.claudy/bin/
 $claudyCmdPath = Join-Path $claudyBinDir "claudy.cmd"
 $claudyCmdContent = @"
@@ -310,6 +302,13 @@ $settingsContent = @"
 "headers": {
 "Authorization": "Bearer $apiKey"
 }
+},
+"zread": {
+"type": "http",
+"url": "https://api.z.ai/api/mcp/zread/mcp",
+"headers": {
+"Authorization": "Bearer $apiKey"
+}
 }
 }
 }
@@ -318,9 +317,52 @@ $settingsContent | Out-File -FilePath $settingsPath -Encoding utf8 -Force
 Write-Host "[OK] Configuration GLM 4.7 creee" -ForegroundColor Green
 Write-Host "[OK] Mode bypass permissions active" -ForegroundColor Green
 Write-Host "[OK] Auto-updater desactive" -ForegroundColor Green
-Write-Host "[OK] 3 serveurs MCP configures" -ForegroundColor Green
+Write-Host "[OK] 4 serveurs MCP configures" -ForegroundColor Green
 Write-Host "[OK] CLAUDE_CODE_MAX_OUTPUT_TOKENS = 200000" -ForegroundColor Green
 Write-Host "[OK] FIX Windows: cmd /c npx pour zai-vision" -ForegroundColor Green
+
+# Create .claude.json with MCP servers directly configured
+# This ensures MCP servers appear in /mcp command without needing sync script
+$claudeJsonPath = Join-Path $claudyDir ".claude.json"
+$claudeJsonContent = @"
+{
+  "mcpServers": {
+    "zai-vision": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@z_ai/mcp-server"],
+      "env": {
+        "Z_AI_API_KEY": "$apiKey",
+        "Z_AI_MODE": "ZAI"
+      }
+    },
+    "web-search-prime": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer $apiKey"
+      }
+    },
+    "web-reader": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer $apiKey"
+      }
+    },
+    "zread": {
+      "type": "http",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer $apiKey"
+      }
+    }
+  }
+}
+"@
+
+$claudeJsonContent | Out-File -FilePath $claudeJsonPath -Encoding utf8 -Force
+Write-Host "[OK] .claude.json cree avec MCP servers" -ForegroundColor Green
 # Download CLAUDE.md from GitHub
 $claudeMdPath = Join-Path $claudyDir "CLAUDE.md"
 $claudeMdUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/CLAUDE.md"
