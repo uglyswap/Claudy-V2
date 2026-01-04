@@ -121,17 +121,17 @@ echo -e "${GREEN}[OK] Logo anime installe${NC}"
 echo -e "${GRAY}[INFO] MCP servers will be configured directly in .claude.json${NC}"
 
 # ============================================
-# COPY LOCAL CLAUDY WRAPPER FROM REPO
+# DOWNLOAD CLAUDY WRAPPER FROM GITHUB
 # ============================================
+echo -e "${YELLOW}Telechargement du wrapper claudy...${NC}"
+CLAUDY_WRAPPER_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/bin/claudy"
 CLAUDY_WRAPPER_PATH="$CLAUDY_BIN_DIR/claudy"
-SOURCE_WRAPPER_PATH="$(dirname "$0")/bin/claudy"
-if [ -f "$SOURCE_WRAPPER_PATH" ]; then
-    cp "$SOURCE_WRAPPER_PATH" "$CLAUDY_WRAPPER_PATH"
+if curl -fsSL "$CLAUDY_WRAPPER_URL" -o "$CLAUDY_WRAPPER_PATH" 2>/dev/null; then
     chmod +x "$CLAUDY_WRAPPER_PATH"
-    echo -e "${GREEN}[OK] Wrapper claudy copie depuis le repo local${NC}"
+    echo -e "${GREEN}[OK] Wrapper claudy telecharge depuis GitHub${NC}"
 else
-    echo -e "${YELLOW}[WARN] Wrapper local non trouve, creation du wrapper par defaut${NC}"
-    # Fallback: create a basic wrapper if local file doesn't exist
+    echo -e "${YELLOW}[WARN] Impossible de telecharger le wrapper, creation du wrapper par defaut${NC}"
+    # Fallback: create a basic wrapper if download fails
     cat > "$CLAUDY_WRAPPER_PATH" << 'WRAPPER_FALLBACK'
 #!/bin/bash
 echo -e "\033[0;31m[ERREUR] Wrapper local non trouve. Reinstallez Claudy-V2.\033[0m"

@@ -156,14 +156,14 @@ try {
 # DOWNLOAD CLAUDY WRAPPER SCRIPTS FROM GITHUB
 # ============================================
 Write-Host "Telechargement des scripts Claudy..." -ForegroundColor Yellow
-# Copy local claudy.ps1 wrapper (with .claude.json support)
-$sourceWrapperPath = Join-Path $PSScriptRoot "bin\claudy.ps1"
+# Download claudy.ps1 wrapper from GitHub
+$claudyPs1Url = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/bin/claudy.ps1"
 $claudyPs1Path = Join-Path $claudyBinDir "claudy.ps1"
-if (Test-Path $sourceWrapperPath) {
-    Copy-Item -Path $sourceWrapperPath -Destination $claudyPs1Path -Force
-    Write-Host "[OK] claudy.ps1 copie depuis le repo local" -ForegroundColor Green
-} else {
-    Write-Host "[WARN] Wrapper local non trouve, utilisation du wrapper par defaut" -ForegroundColor Yellow
+try {
+    Invoke-WebRequest -Uri $claudyPs1Url -OutFile $claudyPs1Path -UseBasicParsing
+    Write-Host "[OK] claudy.ps1 telecharge depuis GitHub" -ForegroundColor Green
+} catch {
+    Write-Host "[WARN] Impossible de telecharger claudy.ps1: $_" -ForegroundColor Yellow
 }
 # NOTE: sync-mcp.js is no longer needed - MCP servers are now directly in .claude.json
 # Create batch file in ~/.claudy/bin/
