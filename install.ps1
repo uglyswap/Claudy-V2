@@ -102,7 +102,7 @@ Write-Host "Creation de cli-claudy.js avec branding Claudy..." -ForegroundColor 
 $cliSourcePath = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli.js"
 $cliClaudyPath = Join-Path $claudyLibDir "node_modules\@anthropic-ai\claude-code\cli-claudy.js"
 # Download and run the patch script with the local path
-$patchScriptUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+$patchScriptUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
 $patchScriptPath = Join-Path $env:TEMP "patch-claudy-logo.js"
 try {
     Invoke-WebRequest -Uri $patchScriptUrl -OutFile $patchScriptPath -UseBasicParsing
@@ -120,7 +120,7 @@ finally {
 }
 # Download and install Claudy-Logo module (for wrapper animation)
 Write-Host "Installation du module Claudy-Logo..." -ForegroundColor Yellow
-$logoModuleUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/Claudy-Logo.psm1"
+$logoModuleUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/Claudy-Logo.psm1"
 $logoModulePath = Join-Path $claudyModulesDir "Claudy-Logo.psm1"
 try {
     Invoke-WebRequest -Uri $logoModuleUrl -OutFile $logoModulePath -UseBasicParsing
@@ -132,7 +132,7 @@ try {
 # INSTALL HOOKS (for /cle-api command fallback)
 # ============================================
 Write-Host "Installation des hooks Claudy..." -ForegroundColor Yellow
-$cleHookUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/hooks/cle-hook.ps1"
+$cleHookUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/hooks/cle-hook.ps1"
 $cleHookPath = Join-Path $claudyHooksDir "cle-hook.ps1"
 try {
     Invoke-WebRequest -Uri $cleHookUrl -OutFile $cleHookPath -UseBasicParsing
@@ -144,7 +144,7 @@ try {
 # INSTALL CLE-API HANDLER (for native /cle-api command)
 # ============================================
 Write-Host "Installation du handler /cle-api..." -ForegroundColor Yellow
-$cleHandlerUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/lib/cle-api-handler.js"
+$cleHandlerUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/lib/cle-api-handler.js"
 $cleHandlerPath = Join-Path $claudyLibDir "cle-api-handler.js"
 try {
     Invoke-WebRequest -Uri $cleHandlerUrl -OutFile $cleHandlerPath -UseBasicParsing

@@ -99,7 +99,7 @@ echo -e "${GREEN}[OK] Claude Code v${CLAUDE_CODE_VERSION} installe dans ~/.claud
 # ============================================
 echo -e "${YELLOW}Application du branding Claudy...${NC}"
 # Download and run the patch script with local path
-PATCH_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
+PATCH_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
 PATCH_SCRIPT_PATH="/tmp/patch-claudy-logo.js"
 if curl -fsSL "$PATCH_SCRIPT_URL" -o "$PATCH_SCRIPT_PATH" 2>/dev/null; then
     # Pass the local installation path as argument
@@ -111,7 +111,7 @@ else
 fi
 # Download logo script
 echo -e "${YELLOW}Installation du logo anime...${NC}"
-LOGO_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/claudy-logo.sh"
+LOGO_SCRIPT_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/claudy-logo.sh"
 LOGO_SCRIPT_PATH="$CLAUDY_BIN_DIR/claudy-logo.sh"
 curl -fsSL "$LOGO_SCRIPT_URL" -o "$LOGO_SCRIPT_PATH" 2>/dev/null || true
 chmod +x "$LOGO_SCRIPT_PATH" 2>/dev/null || true
