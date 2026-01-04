@@ -121,218 +121,24 @@ echo -e "${GREEN}[OK] Logo anime installe${NC}"
 echo -e "${GRAY}[INFO] MCP servers will be configured directly in .claude.json${NC}"
 
 # ============================================
-# CREATE CLAUDY WRAPPER SCRIPT WITH API KEY VALIDATION
+# COPY LOCAL CLAUDY WRAPPER FROM REPO
 # ============================================
 CLAUDY_WRAPPER_PATH="$CLAUDY_BIN_DIR/claudy"
-cat > "$CLAUDY_WRAPPER_PATH" << 'WRAPPER'
+SOURCE_WRAPPER_PATH="$(dirname "$0")/bin/claudy"
+if [ -f "$SOURCE_WRAPPER_PATH" ]; then
+    cp "$SOURCE_WRAPPER_PATH" "$CLAUDY_WRAPPER_PATH"
+    chmod +x "$CLAUDY_WRAPPER_PATH"
+    echo -e "${GREEN}[OK] Wrapper claudy copie depuis le repo local${NC}"
+else
+    echo -e "${YELLOW}[WARN] Wrapper local non trouve, creation du wrapper par defaut${NC}"
+    # Fallback: create a basic wrapper if local file doesn't exist
+    cat > "$CLAUDY_WRAPPER_PATH" << 'WRAPPER_FALLBACK'
 #!/bin/bash
-# Claudy - Independent installation wrapper
-# Uses ~/.claudy/ for EVERYTHING (config + code)
-# Completely independent from Claude Code CLI
-# - claudy uses cli-claudy.js (patched)
-# - claude uses cli.js (original)
-# Set terminal title to "claudy"
-echo -ne "\033]0;claudy\007"
-CLAUDY_DIR="$HOME/.claudy"
-CLAUDY_LIB_DIR="$CLAUDY_DIR/lib"
-LOGO_SCRIPT="$CLAUDY_DIR/bin/claudy-logo.sh"
-SETTINGS_PATH="$CLAUDY_DIR/settings.json"
-# Check for --no-logo or -n flag
-SHOW_LOGO=true
-ARGS=()
-for arg in "$@"; do
-    if [ "$arg" = "--no-logo" ] || [ "$arg" = "-n" ]; then
-        SHOW_LOGO=false
-    else
-        ARGS+=("$arg")
-    fi
-done
-# Show animated logo if script exists and not disabled
-if [ "$SHOW_LOGO" = true ] && [ -x "$LOGO_SCRIPT" ]; then
-    "$LOGO_SCRIPT" 2>/dev/null || true
+echo -e "\033[0;31m[ERREUR] Wrapper local non trouve. Reinstallez Claudy-V2.\033[0m"
+exit 1
+WRAPPER_FALLBACK
+    chmod +x "$CLAUDY_WRAPPER_PATH"
 fi
-# ============================================
-# API KEY VALIDATION AT STARTUP (SILENT)
-# ============================================
-test_api_key() {
-    local key="$1"
-    # Check for placeholder or empty key
-    if [ -z "$key" ] || [ "$key" = "VOTRE_CLE_API_ZAI_ICI" ] || [ ${#key} -lt 10 ]; then
-        return 1
-    fi
-    # Test the API key silently
-    local response
-    response=$(curl -s -o /dev/null -w "%{http_code}" \
-        -X POST "https://api.z.ai/api/anthropic/v1/messages" \
-        -H "Authorization: Bearer $key" \
-        -H "Content-Type: application/json" \
-        -d '{"model":"glm-4.7","max_tokens":1,"messages":[{"role":"user","content":"test"}]}' \
-        --connect-timeout 10 2>/dev/null)
-    if [ "$response" = "401" ] || [ "$response" = "403" ]; then
-        return 1
-    fi
-    return 0
-}
-update_api_key() {
-    local new_key="$1"
-    local old_key="$2"
-    if [ -f "$SETTINGS_PATH" ]; then
-        # Use sed to replace all occurrences
-        sed -i.bak "s|$old_key|$new_key|g" "$SETTINGS_PATH"
-        rm -f "${SETTINGS_PATH}.bak"
-        return 0
-    fi
-    return 1
-}
-prompt_for_new_key() {
-    local reason="$1"
-    echo ""
-    echo -e "\033[1;33m========================================\033[0m"
-    echo -e "\033[1;33m CLE API Z.AI INVALIDE OU MANQUANTE \033[0m"
-    echo -e "\033[1;33m========================================\033[0m"
-    echo ""
-    echo -e "\033[0;90mRaison: $reason\033[0m"
-    echo ""
-    echo -e "\033[0;36mEntrez votre nouvelle cle API Z.AI:\033[0m"
-    read -r new_key
-    if [ -z "$new_key" ]; then
-        echo -e "\033[0;31m[ERREUR] La cle ne peut pas etre vide.\033[0m"
-        return 1
-    fi
-    echo "$new_key"
-}
-# Read current API key from settings.json
-API_KEY=""
-if [ -f "$SETTINGS_PATH" ]; then
-    if command -v python3 &> /dev/null; then
-        API_KEY=$(python3 -c "
-import json
-try:
-    with open('$SETTINGS_PATH', 'r') as f:
-        settings = json.load(f)
-        print(settings.get('env', {}).get('ANTHROPIC_AUTH_TOKEN', ''))
-except:
-    pass
-" 2>/dev/null)
-    elif command -v python &> /dev/null; then
-        API_KEY=$(python -c "
-import json
-try:
-    with open('$SETTINGS_PATH', 'r') as f:
-        settings = json.load(f)
-        print(settings.get('env', {}).get('ANTHROPIC_AUTH_TOKEN', ''))
-except:
-    pass
-" 2>/dev/null)
-    fi
-fi
-# Check if API key needs update
-KEY_NEEDS_UPDATE=false
-UPDATE_REASON=""
-if [ -z "$API_KEY" ]; then
-    KEY_NEEDS_UPDATE=true
-    UPDATE_REASON="Aucune cle API trouvee dans settings.json"
-elif [ "$API_KEY" = "VOTRE_CLE_API_ZAI_ICI" ]; then
-    KEY_NEEDS_UPDATE=true
-    UPDATE_REASON="Cle API placeholder detectee"
-else
-    # Test the API key silently (no message)
-    if ! test_api_key "$API_KEY"; then
-        KEY_NEEDS_UPDATE=true
-        UPDATE_REASON="Cle API invalide ou expiree (erreur 401/403)"
-    fi
-fi
-# If key needs update, prompt for new one
-if [ "$KEY_NEEDS_UPDATE" = true ]; then
-    NEW_KEY=$(prompt_for_new_key "$UPDATE_REASON")
-    if [ -n "$NEW_KEY" ]; then
-        OLD_KEY_TO_REPLACE="${API_KEY:-VOTRE_CLE_API_ZAI_ICI}"
-        if update_api_key "$NEW_KEY" "$OLD_KEY_TO_REPLACE"; then
-            echo ""
-            echo -e "\033[0;32m[OK] Cle API mise a jour dans les 4 emplacements\033[0m"
-            echo ""
-            API_KEY="$NEW_KEY"
-        else
-            echo -e "\033[0;31m[ERREUR] Impossible de mettre a jour settings.json\033[0m"
-            exit 1
-        fi
-    else
-        echo -e "\033[0;31m[ERREUR] Cle API requise pour utiliser Claudy.\033[0m"
-        exit 1
-    fi
-fi
-
-# ============================================
-# EXPORT ENVIRONMENT VARIABLES
-# ============================================
-if [ -f "$SETTINGS_PATH" ]; then
-    if command -v python3 &> /dev/null; then
-        eval $(python3 -c "
-import json
-import sys
-try:
-    with open('$SETTINGS_PATH', 'r') as f:
-        settings = json.load(f)
-        env_vars = settings.get('env', {})
-        for key, value in env_vars.items():
-            escaped_value = str(value).replace(\"'\", \"'\\\"'\\\"\")
-            print(f\"export {key}='{escaped_value}'\")
-except Exception as e:
-    sys.stderr.write(f'Warning: Could not parse settings.json: {e}\\n')
-" 2>/dev/null)
-    elif command -v python &> /dev/null; then
-        eval $(python -c "
-import json
-import sys
-try:
-    with open('$SETTINGS_PATH', 'r') as f:
-        settings = json.load(f)
-        env_vars = settings.get('env', {})
-        for key, value in env_vars.items():
-            escaped_value = str(value).replace(\"'\", \"'\\\"'\\\"\")
-            print('export {}=\\'{}\\''.format(key, escaped_value))
-except Exception as e:
-    sys.stderr.write('Warning: Could not parse settings.json: {}\\n'.format(e))
-" 2>/dev/null)
-    fi
-fi
-# Set config dir
-export CLAUDE_CONFIG_DIR="$HOME/.claudy"
-# Path to our isolated cli-claudy.js (PATCHED version)
-CLAUDY_EXE="$CLAUDY_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli-claudy.js"
-# AUTO-REPAIR: If cli-claudy.js doesn't exist, recreate it
-if [ ! -f "$CLAUDY_EXE" ]; then
-    echo -e "\033[1;33m[AUTO-REPAIR] cli-claudy.js manquant, re-creation en cours...\033[0m"
-    PATCH_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/patch-claudy-logo.js"
-    PATCH_PATH="/tmp/patch-claudy-logo.js"
-    if curl -fsSL "$PATCH_URL" -o "$PATCH_PATH" 2>/dev/null; then
-        if node "$PATCH_PATH" "$CLAUDY_LIB_DIR" 2>/dev/null; then
-            echo -e "\033[0;32m[AUTO-REPAIR] cli-claudy.js recree avec succes\033[0m"
-            rm -f "$PATCH_PATH"
-        else
-            echo -e "\033[1;33m[WARN] Impossible d'executer le patch\033[0m"
-            rm -f "$PATCH_PATH"
-        fi
-    else
-        echo -e "\033[1;33m[WARN] Impossible de telecharger le patch\033[0m"
-    fi
-fi
-# Fallback to cli.js if cli-claudy.js still doesn't exist
-if [ ! -f "$CLAUDY_EXE" ]; then
-    CLAUDY_EXE="$CLAUDY_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli.js"
-fi
-if [ -f "$CLAUDY_EXE" ]; then
-    # Always add --dangerously-skip-permissions to bypass folder confirmation
-    # Claudy trusts all directories by default (no "Do you want to work in this folder?" prompt)
-    exec node "$CLAUDY_EXE" --dangerously-skip-permissions "${ARGS[@]}"
-else
-    echo -e "\033[0;31m[ERREUR] Claudy introuvable. Reinstallez avec:\033[0m"
-    echo -e "\033[1;33mcurl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy/main/install.sh | bash\033[0m"
-    exit 1
-fi
-WRAPPER
-chmod +x "$CLAUDY_WRAPPER_PATH"
-echo -e "${GREEN}[OK] Wrapper Claudy cree dans ~/.claudy/bin/${NC}"
 # ============================================
 # ADD CLAUDY TO PATH
 # ============================================

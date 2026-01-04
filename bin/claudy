@@ -1,0 +1,220 @@
+#!/usr/bin/env bash
+# Claudy - Independent installation wrapper
+# Uses ~/.claudy/ for EVERYTHING (config + code)
+# Completely independent from Claude Code CLI
+
+# Set terminal title
+printf '\033]0;claudy\007'
+
+CLAUDE_DIR="$HOME/.claudy"
+CLAUDE_LIB_DIR="$CLAUDE_DIR/lib"
+MODULE_PATH="$CLAUDE_DIR/modules/Claudy-Logo.sh"
+SETTINGS_PATH="$CLAUDE_DIR/settings.json"
+CLAUDE_JSON_PATH="$CLAUDE_DIR/.claude.json"
+
+# Check for --no-logo or -n flag
+show_logo=true
+filtered_args=()
+for arg in "$@"; do
+    if [[ "$arg" == "--no-logo" || "$arg" == "-n" ]]; then
+        show_logo=false
+    else
+        filtered_args+=("$arg")
+    fi
+done
+
+# Show static logo if module exists and not disabled
+if [ "$show_logo" = true ] && [ -f "$MODULE_PATH" ]; then
+    bash "$MODULE_PATH" --no-animation 2>/dev/null || true
+fi
+
+# ============================================
+# API KEY VALIDATION AT STARTUP (SILENT)
+# ============================================
+
+test_zai_api_key() {
+    local key="$1"
+
+    # Check for placeholder or empty key
+    if [[ -z "$key" || "$key" == "VOTRE_CLE_API_ZAI_ICI" || ${#key} -lt 10 ]]; then
+        return 1
+    fi
+
+    # Test API key with curl
+    local response
+    response=$(curl -s -w "\n%{http_code}" -X POST \
+        "https://api.z.ai/api/anthropic/v1/messages" \
+        -H "Authorization: Bearer $key" \
+        -H "Content-Type: application/json" \
+        -d '{"model":"glm-4.7","max_tokens":1,"messages":[{"role":"user","content":"test"}]}' \
+        --max-time 10 2>/dev/null)
+
+    local status_code=$(echo "$response" | tail -n1)
+    # 401/403 = key is definitely invalid
+    if [[ "$status_code" == "401" || "$status_code" == "403" ]]; then
+        return 1
+    fi
+    # Other errors (network, rate limit) = assume key is OK
+    return 0
+}
+
+update_api_key_in_settings() {
+    local new_key="$1"
+    local old_key="$2"
+
+    if [[ ! -f "$SETTINGS_PATH" ]]; then
+        return 1
+    fi
+
+    # Replace all occurrences of old key with new key (using temp file for macOS compatibility)
+    local temp_file="${SETTINGS_PATH}.tmp"
+    sed "s/$(printf '%s\n' "$old_key" | sed 's/[[\.*^$()+?{|/]/\\&/g')/$new_key/g" "$SETTINGS_PATH" > "$temp_file" && mv "$temp_file" "$SETTINGS_PATH"
+    return $?
+}
+
+update_api_key_in_claude_json() {
+    local new_key="$1"
+    local old_key="$2"
+
+    if [[ ! -f "$CLAUDE_JSON_PATH" ]]; then
+        return 1
+    fi
+
+    # Replace all occurrences of old key with new key (using temp file for macOS compatibility)
+    local temp_file="${CLAUDE_JSON_PATH}.tmp"
+    sed "s/$(printf '%s\n' "$old_key" | sed 's/[[\.*^$()+?{|/]/\\&/g')/$new_key/g" "$CLAUDE_JSON_PATH" > "$temp_file" && mv "$temp_file" "$CLAUDE_JSON_PATH"
+    return $?
+}
+
+prompt_for_new_api_key() {
+    local reason="$1"
+
+    echo ""
+    echo "========================================"
+    echo "   CLE API Z.AI INVALIDE OU MANQUANTE  "
+    echo "========================================"
+    echo ""
+    echo "Raison: $reason"
+    echo ""
+    echo -n "Entrez votre nouvelle cle API Z.AI: "
+    read -r new_key
+
+    if [[ -z "$new_key" || -z "${new_key// /}" ]]; then
+        echo "[ERREUR] La cle ne peut pas etre vide." >&2
+        return 1
+    fi
+
+    echo "$new_key"
+    return 0
+}
+
+# Read settings.json and get current API key
+api_key=""
+if [[ -f "$SETTINGS_PATH" ]]; then
+    api_key=$(grep -o '"ANTHROPIC_AUTH_TOKEN"[[:space:]]*:[[:space:]]*"[^"]*"' "$SETTINGS_PATH" | cut -d'"' -f4 2>/dev/null || echo "")
+fi
+
+# Check if API key exists and is valid (SILENT - no message)
+key_needs_update=false
+update_reason=""
+
+if [[ -z "$api_key" ]]; then
+    key_needs_update=true
+    update_reason="Aucune cle API trouvee dans settings.json"
+elif [[ "$api_key" == "VOTRE_CLE_API_ZAI_ICI" ]]; then
+    key_needs_update=true
+    update_reason="Cle API placeholder detectee"
+else
+    # Test the API key silently
+    if ! test_zai_api_key "$api_key"; then
+        key_needs_update=true
+        update_reason="Cle API invalide ou expiree (erreur 401/403)"
+    fi
+fi
+
+# If key needs update, prompt for new one
+if [[ "$key_needs_update" == true ]]; then
+    new_key=$(prompt_for_new_api_key "$update_reason")
+
+    if [[ $? -eq 0 && -n "$new_key" ]]; then
+        # Validate new key format (warning only)
+        if [[ ! "$new_key" =~ ^[a-zA-Z0-9]+\.[a-zA-Z0-9]+$ ]]; then
+            echo "[WARN] Le format de la cle semble inhabituel, mais on continue..."
+        fi
+
+        # Update API key in both files (5 locations total)
+        old_key_to_replace="${api_key:-VOTRE_CLE_API_ZAI_ICI}"
+
+        update_api_key_in_settings "$new_key" "$old_key_to_replace"
+        success1=$?
+        update_api_key_in_claude_json "$new_key" "$old_key_to_replace"
+        success2=$?
+
+        if [[ $success1 -eq 0 && $success2 -eq 0 ]]; then
+            echo ""
+            echo "[OK] Cle API mise a jour dans les 5 emplacements"
+            echo "    - settings.json (env.ANTHROPIC_AUTH_TOKEN)"
+            echo "    - .claude.json (4 serveurs MCP)"
+            echo ""
+
+            # Update api_key variable for env export
+            api_key="$new_key"
+        else
+            echo "[ERREUR] Impossible de mettre a jour les fichiers de configuration" >&2
+            exit 1
+        fi
+    else
+        echo "[ERREUR] Cle API requise pour utiliser Claudy." >&2
+        exit 1
+    fi
+fi
+
+# ============================================
+# EXPORT ENVIRONMENT VARIABLES
+# ============================================
+
+# Export environment variables from settings.json
+if [[ -f "$SETTINGS_PATH" ]]; then
+    # Parse JSON and export env variables (works on both GNU and BSD sed)
+    while IFS= read -r line; do
+        if [[ "$line" =~ \"([^\"]+)\":[[:space:]]*\"([^\"]+)\" ]]; then
+            key="${BASH_REMATCH[1]}"
+            value="${BASH_REMATCH[2]}"
+            export "$key=$value"
+        fi
+    done < <(grep -oE '"[^"]+"[[:space:]]*:[[:space:]]*"[^"]*"' "$SETTINGS_PATH" | sed 's/"//g' | sed 's/[[:space:]]*:[[:space:]]*/=/' || true)
+fi
+
+# Set config dir
+export CLAUDE_CONFIG_DIR="$CLAUDE_DIR"
+
+# Path to our isolated cli-claudy.js
+CLAUDE_EXE="$CLAUDE_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli-claudy.js"
+
+# AUTO-REPAIR: If cli-claudy.js doesn't exist, recreate it
+if [[ ! -f "$CLAUDE_EXE" ]]; then
+    echo "[AUTO-REPAIR] cli-claudy.js manquant, re-creation en cours..."
+    patch_url="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/patch-claudy-logo.js"
+    patch_path="/tmp/patch-claudy-logo.js"
+    if curl -fsSL "$patch_url" -o "$patch_path" && node "$patch_path" "$CLAUDE_LIB_DIR" 2>&1; then
+        rm -f "$patch_path"
+        echo "[AUTO-REPAIR] cli-claudy.js recree avec succes"
+    else
+        echo "[WARN] Impossible de recreer cli-claudy.js"
+    fi
+fi
+
+# Fallback to cli.js if cli-claudy.js still doesn't exist
+if [[ ! -f "$CLAUDE_EXE" ]]; then
+    CLAUDE_EXE="$CLAUDE_LIB_DIR/node_modules/@anthropic-ai/claude-code/cli.js"
+fi
+
+if [[ -f "$CLAUDE_EXE" ]]; then
+    # Always add --dangerously-skip-permissions to bypass folder confirmation
+    # Claudy trusts all directories by default (no "Do you want to work in this folder?" prompt)
+    node "$CLAUDE_EXE" --dangerously-skip-permissions "${filtered_args[@]}"
+else
+    echo "[ERREUR] Claudy introuvable. Reinstallez avec:" >&2
+    echo "curl -fsSL https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/install.sh | bash" >&2
+    exit 1
+fi
