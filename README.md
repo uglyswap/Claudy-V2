@@ -16,6 +16,7 @@ Un assistant de code IA dans votre terminal, propulsé par **GLM 4.7** (Z.AI).
 - **Interface épurée** - Suppression des bordures autour du welcome screen
 - **100% Indépendant** - Installation isolée dans `~/.claudy/`
 - **AKHITHINK** - Mode réflexion profonde avec animation rainbow 🌈
+- **LES ZHOMMES** - Mode projet structuré avec animation rainbow 🌈 (NOUVEAU !)
 
 ---
 
@@ -107,6 +108,86 @@ akhithink conçois un système de cache distribué
 | Code direct | Justification profonde |
 | 1-2 alternatives | Toutes les options explorées |
 | Focus solution | Focus compréhension |
+
+---
+
+## 🌈 Commande LES ZHOMMES
+
+**LES ZHOMMES** est la commande signature de Claudy pour activer le mode projet structuré avec workflow en 6 étapes.
+
+### Comment l'utiliser
+
+Tapez simplement `leszhommes` ou `LESZHOMMES` suivi de votre demande :
+
+```
+leszhommes créé moi une landing page pour un chirurgien esthétique
+LESZHOMMES développe une API REST complète avec authentification
+leszhommes refactore ce code legacy en suivant les best practices
+```
+
+### Ce qui se passe
+
+1. **🌈 Animation Rainbow** : Le mot "LES ZHOMMES" s'affiche avec une animation arc-en-ciel (comme `akhithink`)
+2. **⚡ Mode Activé** : "On est les Zhommes ou on n'est pas les Zhommes !"
+3. **📋 Workflow en 6 étapes** :
+   - **STEP 1**: Génération d'une spec complète (exhaustive)
+   - **STEP 2**: Création d'une todolist structurée
+   - **STEP 3**: Exécution méthodique (avec TodoWrite)
+   - **STEP 4**: Tests et validation
+   - **STEP 5**: Déployment si applicable
+   - **STEP 6**: Résumé final
+
+### Format de Réponse LES ZHOMMES
+
+```
+⚡ LES ZHOMMES MODE ACTIVÉ ⚡
+
+On est les Zhommes ou on n'est pas les Zhommes nous ? C'est parti pour le cassage de culs !!!!!!!!
+
+📋 STEP 1: REQUIREMENTS
+- Objectifs du projet
+- Features requises (liste exhaustive)
+- Contraintes techniques
+- Architecture proposée
+- Risques identifiés
+
+[WAIT FOR VALIDATION]
+
+✅ STEP 2: TODOLIST
+[Todolist complète créée avec TodoWrite]
+
+[WAIT FOR VALIDATION]
+
+🚀 STEP 3: EXECUTION
+[Exécution méthode pas à pas]
+
+🔍 STEP 4: QUALITY
+[Tests et vérifications]
+
+📦 STEP 5: DEPLOYMENT
+[Déploiement si applicable]
+
+✨ STEP 6: SUMMARY
+[Récapitulatif final]
+```
+
+### Idéal pour
+
+- ✅ Nouveaux projets complets
+- ✅ Features complexes multi-étapes
+- ✅ Refactorings majeurs
+- ✅ Architectures from scratch
+- ❌ Questions simples ou rapides (utilisez le mode normal)
+
+### Différence avec AKHITHINK
+
+| AKHITHINK | LES ZHOMMES |
+|-----------|-------------|
+| Réflexion profonde | Workflow structuré |
+| Analyse multi-dimensionnelle | Exécution pas à pas |
+| Pour problèmes complexes | Pour projets complets |
+| Focus compréhension | Focus livraison |
+| Pas de todolist | Todolist obligatoire |
 
 ---
 

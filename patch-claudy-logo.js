@@ -10,6 +10,7 @@
  * Features:
  * - CLAUDY ASCII logo with gradient colors
  * - AKHITHINK detection for rainbow animation
+ * - LESZHOMMES detection for rainbow animation (NEW!)
  * - All "Claude Code" text replaced with "Claudy"
  * - All config paths changed from ~/.claude/ to ~/.claudy/
  * - /cle-api command injected as native command (no model needed)
@@ -157,57 +158,84 @@ const newLogoStructure2 = [
 // }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 4: Add AKHITHINK detection to ultrathink function
+// PATCH 4: Add AKHITHINK and LESZHOMMES detection to ultrathink function
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ultrathinkPatterns = [
     {
         old: 'Q==="ultrathink"||Q==="think ultra hard"||Q==="think ultrahard"',
-        new: 'Q==="ultrathink"||Q==="think ultra hard"||Q==="think ultrahard"||Q==="akhithink"'
+        new: 'Q==="ultrathink"||Q==="think ultra hard"||Q==="think ultrahard"||Q==="akhithink"||Q==="leszhommes"'
     },
     {
         old: 'Q==="think ultra hard"||Q==="think ultrahard"||Q==="ultrathink"',
-        new: 'Q==="think ultra hard"||Q==="think ultrahard"||Q==="ultrathink"||Q==="akhithink"'
+        new: 'Q==="think ultra hard"||Q==="think ultrahard"||Q==="ultrathink"||Q==="akhithink"||Q==="leszhommes"'
+    },
+    {
+        old: 'Q==="ultrathink"||Q==="think ultra hard"||Q==="think ultrahard"||Q==="akhithink"',
+        new: 'Q==="ultrathink"||Q==="think ultra hard"||Q==="think ultrahard"||Q==="akhithink"||Q==="leszhommes"'
+    },
+    {
+        old: 'Q==="think ultra hard"||Q==="think ultrahard"||Q==="ultrathink"||Q==="akhithink"',
+        new: 'Q==="think ultra hard"||Q==="think ultrahard"||Q==="ultrathink"||Q==="akhithink"||Q==="leszhommes"'
     }
 ];
 
 for (const pattern of ultrathinkPatterns) {
-    if (content.includes(pattern.old) && !content.includes('"akhithink"')) {
+    if (content.includes(pattern.old) && !content.includes('||Q==="leszhommes"')) {
         content = content.replace(pattern.old, pattern.new);
         patchCount++;
-        console.log('  [OK] Added "akhithink" to ultrathink detection (rainbow animation enabled)');
+        console.log('  [OK] Added "akhithink" and "leszhommes" to ultrathink detection (rainbow animation enabled)');
         break;
     }
 }
 
-if (content.includes('"akhithink"')) {
-    console.log('  [INFO] AKHITHINK string detection already present');
+if (content.includes('"leszhommes"')) {
+    console.log('  [INFO] AKHITHINK and LESZHOMMES string detection already present');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PATCH 5: Replace ultrathink REGEX patterns to also match "akhithink"
+// PATCH 5: Replace ultrathink REGEX patterns to also match "akhithink" and "leszhommes"
 // ═══════════════════════════════════════════════════════════════════════════
 
 const regexPattern1Old = '/\\bultrathink\\b/i';
-const regexPattern1New = '/\\b(ultrathink|akhithink)\\b/i';
+const regexPattern1New = '/\\b(ultrathink|akhithink|leszhommes)\\b/i';
 
-if (content.includes(regexPattern1Old) && !content.includes('akhithink)\\b/i')) {
+if (content.includes(regexPattern1Old) && !content.includes('leszhommes)\\b/i')) {
     content = content.split(regexPattern1Old).join(regexPattern1New);
     patchCount++;
-    console.log('  [OK] Patched regex /\\bultrathink\\b/i → includes akhithink');
+    console.log('  [OK] Patched regex /\\bultrathink\\b/i → includes akhithink and leszhommes');
 }
 
 const regexPattern2Old = '/\\bultrathink\\b/gi';
-const regexPattern2New = '/\\b(ultrathink|akhithink)\\b/gi';
+const regexPattern2New = '/\\b(ultrathink|akhithink|leszhommes)\\b/gi';
 
-if (content.includes(regexPattern2Old) && !content.includes('akhithink)\\b/gi')) {
+if (content.includes(regexPattern2Old) && !content.includes('leszhommes)\\b/gi')) {
     content = content.split(regexPattern2Old).join(regexPattern2New);
     patchCount++;
-    console.log('  [OK] Patched regex /\\bultrathink\\b/gi → includes akhithink');
+    console.log('  [OK] Patched regex /\\bultrathink\\b/gi → includes akhithink and leszhommes');
 }
 
-if (content.includes('akhithink)\\b/')) {
-    console.log('  [INFO] AKHITHINK regex patterns already present');
+// Also handle patterns that already have akhithink
+const regexPattern3Old = '/\\b(ultrathink|akhithink)\\b/i';
+const regexPattern3New = '/\\b(ultrathink|akhithink|leszhommes)\\b/i';
+
+if (content.includes(regexPattern3Old) && !content.includes('leszhommes)\\b/i')) {
+    content = content.split(regexPattern3Old).join(regexPattern3New);
+    patchCount++;
+    console.log('  [OK] Patched regex /\\b(ultrathink|akhithink)\\b/i → includes leszhommes');
+}
+
+const regexPattern4Old = '/\\b(ultrathink|akhithink)\\b/gi';
+const regexPattern4New = '/\\b(ultrathink|akhithink|leszhommes)\\b/gi';
+
+if (content.includes(regexPattern4Old) && !content.includes('leszhommes)\\b/gi')) {
+    content = content.split(regexPattern4Old).join(regexPattern4New);
+    patchCount++;
+    console.log('  [OK] Patched regex /\\b(ultrathink|akhithink)\\b/gi → includes leszhommes');
+}
+
+if (content.includes('leszhommes)\\b/')) {
+    console.log('  [INFO] AKHITHINK and LESZHOMMES regex patterns already present');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
