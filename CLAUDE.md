@@ -69,129 +69,54 @@
 
 **TRIGGER:** When the user says **"leszhommes"** or **"LESZHOMMES"**
 
-### Immediately activate this workflow:
-
 **⚡ LES ZHOMMES MODE ACTIVATED ⚡**
 
-Allez les zhommes, on va pas y aller avec le dos de la cuillère. On pose les choses proprement, et après on démonte tout.
+On est les Zhommes ou on n'est pas les Zhommes nous ? C'est parti pour le cassage de culs !!!!!!!!
 
-### Workflow en 6 étapes:
+### 6-Step Workflow:
 
-#### ÉTAPE 1: 📋 CAHIER DES CHARGES (GÉNÉRATION)
-Analyser la demande du/z de la/les zhommes et générer un cahier des charges COMPLET et EXHAUSTIF:
-- **Objectifs du projet** (business goals, user goals)
-- **Fonctionnalités requises** (liste exhaustive)
-- **Contraintes techniques** (stack, performance, sécurité)
-- **Architecture proposée** (choix justifiés)
-- **Livrables attendus** (ce qui sera fait)
-- **Risques identifiés** + mitigation
+**STEP 1: 📋 REQUIREMENTS (GENERATION)**
+Generate a COMPLETE and EXHAUSTIVE spec:
+- Project objectives (business goals, user goals)
+- Required features (exhaustive list)
+- Technical constraints (stack, performance, security)
+- Proposed architecture (justified choices)
+- Expected deliverables
+- Identified risks + mitigation
 
-**ATTENDRE LA VALIDATION du/z de la/les zhommes avant de passer à l'étape 2.**
+**WAIT for VALIDATION before proceeding to step 2.**
 
-#### ÉTAPE 2: ✅ TODOLIST (DÉCOMPOSITION)
-Transformer le cahier des charges validé en une todolist COMPLÈTE et EXHAUSTIVE:
-- Toutes les tâches techniques (setup, backend, frontend, tests)
-- Toutes les tâches de configuration (env, deps, build)
-- Toutes les tâches de déploiement
-- Ordre logique d'exécution (dépendances)
+**STEP 2: ✅ TODOLIST (DECOMPOSITION)**
+Transform approved spec into COMPLETE TODOLIST:
+- All technical tasks (setup, backend, frontend, tests)
+- All configuration tasks (env, deps, build)
+- All deployment tasks
+- Logical execution order (dependencies)
 
-**Utiliser le TodoWrite tool pour créer la todolist.**
+**Use TodoWrite tool to create todolist.**
 
-**ATTENDRE LA VALIDATION du/z de la/les zhommes avant de passer à l'étape 3.**
+**WAIT for VALIDATION before proceeding to step 3.**
 
-#### ÉTAPE 3: 🚀 EXÉCUTION (MÉTHODIQUE)
-Exécuter la todolist de manière exhaustive et méthodique:
-- Marquer chaque tâche comme "in_progress" avant de commencer
-- Marquer chaque tâche comme "completed" une fois terminée
-- Ne JAMAIS sauter une tâche
-- Si une tâche échoue, documenter le problème et proposer des solutions
+**STEP 3: 🚀 EXECUTION (METHODICAL)**
+Execute todolist exhaustively:
+- Mark task "in_progress" before starting
+- Mark task "completed" when done
+- NEVER skip tasks
+- If task fails, document issue + propose solutions
 
-#### ÉTAPE 4: 🔍 QUALITÉ (TESTS)
-Une fois la todolist complétée:
-- Vérifier que tout fonctionne (smoke tests)
-- Corriger les bugs identifiés
-- S'assurer que les objectifs du cahier des charges sont atteints
+**STEP 4: 🔍 QUALITY (TESTS)**
+Once todolist complete:
+- Verify everything works (smoke tests)
+- Fix identified bugs
+- Ensure requirements are met
 
-#### ÉTAPE 5: 📦 DÉPLOIEMENT (SI APPLICABLE)
-Si le projet doit être déployé:
-- Suivre les checklists de déploiement (Section 16)
-- Vérifier le déploiement
-- Tester en production
+**STEP 5: 📦 DEPLOYMENT (IF APPLICABLE)**
+Follow deployment checklists (Section 16), verify deployment, test in production.
 
-#### ÉTAPE 6: ✨ RÉCAPITULATIF
-Fournir un récapitulatif final:
-- Ce qui a été fait
-- Comment tester
-- Prochaines étapes suggérées
-- Avertissements/notes importantes
+**STEP 6: ✨ SUMMARY**
+Provide final recap: what was done, how to test, next steps, warnings.
 
-### Output Format:
-
-```markdown
-⚡ LES ZHOMMES MODE ACTIVATED ⚡
-
----
-
-## 📋 CAHIER DES CHARGES
-
-### 1. OBJECTIFS
-[...]
-
-### 2. FONCTIONNALITÉS
-[...]
-
-### 3. CONTRAINTES
-[...]
-
-### 4. ARCHITECTURE
-[...]
-
----
-
-**ATTENDRE VALIDATION: "OK" ou ajustements demandés**
-
----
-
-## ✅ TODOLIST
-
-J'ai créé X tâches:
-
-1. [ ] Tâche 1
-2. [ ] Tâche 2
-...
-
----
-
-**ATTENDRE VALIDATION: "OK" ou ajustements demandés**
-
----
-
-## 🚀 EXÉCUTION
-
-**Tâche 1 en cours...**
-[Exécution]
-✅ Tâche 1 complétée
-
-**Tâche 2 en cours...**
-[Exécution]
-✅ Tâche 2 complétée
-
-...
-
----
-
-## ✨ RÉCAPITULATIF
-
-[Résumé final]
-```
-
----
-
-**CE MODE EST IDÉAL POUR:**
-- Nouveaux projets complets
-- Fonctionnalités complexes
-- Refactorings majeurs
-- Quand tu veux "voir venir" tout le travail
+**IDEAL FOR:** New complete projects, complex features, major refactorings.
 
 ---
 
@@ -395,24 +320,7 @@ Start with SQL (PostgreSQL) unless:
 Default: PostgreSQL with JSONB for flexibility
 ```
 
-#### Database Migration Examples
-
-**Prisma Migration:**
-```typescript
-// migrations/20240101_create_users/migration.sql
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_created_at ON users(created_at DESC);
-```
-
-**Drizzle Migration:**
+#### Database Migration Example (Drizzle)
 ```typescript
 import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core'
 
@@ -421,7 +329,6 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
 })
 ```
 
@@ -561,98 +468,31 @@ tests/
 
 ## 14. FRAMEWORK-SPECIFIC ESSENTIALS
 
-### Next.js 15/16 / App Router
-
-#### Server vs Client Components
+### Next.js 15/16 (App Router)
 ```typescript
 'use server'  // Server Actions, database, secrets
 'use client' // Interactive (onClick, useState, useEffect)
 ```
-- Server by default (faster, secure, smaller bundle)
-- Client only when: browser APIs, event listeners, React hooks
+- **Server by default** (faster, secure, smaller bundle)
+- **Client only when:** browser APIs, event listeners, React hooks
 
-#### Server Actions Pattern
+**Server Actions Pattern:**
 ```typescript
 'use server'
-import { z } from 'zod'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-
-const CreatePostSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-})
-
-export async function createPost(formData: FormData) {
-  const data = CreatePostSchema.parse(Object.fromEntries(formData))
+export async function createAction(formData: FormData) {
+  const data = schema.parse(Object.fromEntries(formData))
   await db.create(data)
-  revalidatePath('/posts')
-  redirect('/posts')
+  revalidatePath('/route')
 }
 ```
 
-#### Error Boundary Pattern (React)
-```typescript
-'use client'
-import { Component, ReactNode } from 'react'
+**Caching:** fetch() with next.revalidate, revalidatePath(), unstable_cache(), cacheTag()
 
-interface Props {
-  children: ReactNode
-  fallback?: ReactNode
-}
-
-interface State {
-  hasError: boolean
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false }
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true }
-  }
-
-  componentDidCatch(error: Error, errorInfo: any) {
-    console.error('Error caught by boundary:', error, errorInfo)
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback || <div>Something went wrong</div>
-    }
-    return this.props.children
-  }
-}
-```
-
-#### Caching Strategy
-- fetch() with next.revalidate (seconds)
-- revalidatePath() after mutations
-- unstable_cache() for expensive computations
-- cacheTag() for granular invalidation
-
-### Remix
-- Better forms, progressive enhancement focus
-- Loader/action pattern for data mutations
-- Built-in error and loading boundaries
-
-### SvelteKit
-- Maximum performance, smaller bundle
-- Kit-specific: load functions, form actions
-- Server-side rendering by default
-
-### Nuxt
-- Vue 3 ecosystem, Composition API
-- Auto-imports, file-based routing
-- Server-side rendering, Nitro engine
-
-### Astro
-- Content-first, zero JS by default
-- Island architecture for interactive components
-- Multi-framework support (React, Vue, Svelte islands)
+### Other Frameworks
+- **Remix:** Better forms, progressive enhancement, loader/action pattern
+- **SvelteKit:** Maximum performance, load functions, form actions, SSR default
+- **Nuxt:** Vue 3, Composition API, auto-imports, Nitro engine
+- **Astro:** Content-first, zero JS default, island architecture
 
 ---
 
@@ -827,153 +667,43 @@ export class ErrorBoundary extends Component<Props, State> {
 
 ## 18.5 SPECIALIZED SCENARIOS (Beyond Standard SaaS)
 
-### Business & Productivity
+### Specialized Stack Matrix
 | Type | Framework | Database | Specialized | Deploy |
 |------|-----------|----------|-------------|--------|
-| CRM / Customer Mgmt | Next.js | Postgres + Prisma | RBAC, complex relations | Vercel |
-| ERP / Resource Planning | NestJS/.NET | Postgres + Redis | BullMQ, workflows | AWS/Railway |
-| Project Management | Next.js | Postgres | XState + WebSockets | Vercel |
-| Documentation / Wiki | Next.js | Supabase | Yjs (CRDTs), Tiptap | Vercel |
-| HR / ATS | Next.js | Postgres | Full-text search | Vercel |
+| **CRM/ERP** | Next.js/NestJS | Postgres + Redis | RBAC, BullMQ workflows | Vercel/AWS |
+| **Project Mgmt** | Next.js | Postgres | XState + WebSockets | Vercel |
+| **Wiki/Docs** | Next.js | Supabase | Yjs CRDTs, Tiptap | Vercel |
+| **Video Streaming** | Next.js | Postgres | Mux/AWS Elemental, DRM | Cloudflare |
+| **Audio/Podcast** | Next.js | Postgres + Vector | Recommendations | Railway |
+| **Marketplace** | Next.js | Postgres | Stripe Connect | Vercel |
+| **Social Network** | Next.js | Postgres + Redis | Kafka, fan-out-on-write | AWS/GCP |
+| **Fintech** | Next.js/NestJS | Postgres + Ledger | Plaid, PCI compliance | AWS/GCP |
 
-### Content & Media
-| Type | Framework | Database | Specialized | Deploy |
-|------|-----------|----------|-------------|--------|
-| Video Streaming | Next.js | Postgres | Mux/AWS Elemental, DRM | Cloudflare/Vercel |
-| Audio/Podcast | Next.js | Postgres + Vector | Recommendations, audio processing | Railway/Vercel |
-| Image Gallery | Next.js | Postgres | Cloudinary/ImageKit | Vercel |
-| News / Media Portal | Astro/Next.js | Postgres + Redis | Cache-first, CDN edge | Cloudflare |
-| E-book / Publishing | Next.js | Postgres | Blob storage, EPUB | Vercel |
-
-### Marketplaces & Platforms
-| Type | Framework | Database | Specialized | Deploy |
-|------|-----------|----------|-------------|--------|
-| Two-sided Marketplace | Next.js | Postgres | Stripe Connect, multi-actor | Vercel |
-| Job Board | Astro | Postgres | Algolia search | Cloudflare |
-| Dating App | Next.js | Postgres | Redis geospatial, matching | Railway |
-| Booking / Reservations | Next.js | Postgres | Timezone handling, slots | Vercel |
-| Social Network | Next.js | Postgres + Redis | Kafka, fan-out-on-write | AWS/GCP |
-
-### Fintech & Web3
-| Type | Framework | Database | Specialized | Deploy |
-|------|-----------|----------|-------------|--------|
-| Personal Finance | Next.js | Encrypted Postgres | Plaid, Yodlee, bank APIs | Vercel |
-| Banking / Finance | Next.js | Postgres + Ledger | PCI compliance, encryption | AWS/GCP |
-| Crypto / DeFi | Next.js | Postgres + The Graph | ethers.js/viem, Web3 | Vercel |
-| Payment Processor | NestJS | Postgres | Ledger pattern, Stripe Connect | AWS |
-| Trading / Investment | Next.js | Postgres + Timescale | WebSocket, market data | AWS/GCP |
-
-### When to Use Specialized Stacks
-
-**CRM/ERP:**
-- Use Prisma for complex relations (many-to-many, polymorphic)
-- Implement RBAC: CASL or custom role-based permissions
-- Workflow engines: BullMQ for background jobs
-
-**Collaborative Docs:**
-- CRDT libraries: Yjs (recommended), Automerge
-- Rich text: Tiptap (ProseMirror), Slate.js
-- Real-time: WebSocket or Hocuspocus
-
-**Video/Audio Streaming:**
-- Managed services: Mux (video), Dolby.io (audio)
-- Open source: FFmpeg, HLS.js
-- CDN: Cloudflare Stream, AWS CloudFront
-
-**Marketplaces:**
-- Stripe Connect: Split payments, escrow
-- Multi-actor permissions: Buyer, seller, admin roles
-- Reviews + ratings: Separate service or embedded
-
-**Social Networks:**
-- Feed generation: Fan-out-on-write (Redis)
-- Graph databases: Neo4j or Postgres with recursive CTEs
-- Message queues: Kafka or Redis Pub/Sub
-
-**Fintech:**
-- Ledger pattern: Double-entry accounting
-- Bank integrations: Plaid, Yodlee, TrueLayer
-- Compliance: PCI-DSS, SOC2, GDPR
+**Key Patterns:**
+- **CRM/ERP:** Prisma for complex relations, CASL for RBAC, BullMQ workflows
+- **Collaborative:** Yjs CRDTs, Tiptap rich text, WebSocket real-time
+- **Video/Audio:** Mux/Dolby.io managed, FFmpeg open source
+- **Marketplaces:** Stripe Connect, multi-actor permissions
+- **Social:** Fan-out-on-write (Redis), Kafka, Neo4j or Postgres recursive CTEs
+- **Fintech:** Ledger pattern (double-entry), Plaid integrations, PCI-DSS compliance
 
 ---
 
 ## 18.6 NICHE SCENARIOS (~2% of use cases)
 
-> These scenarios are rare but exist. Use only if specifically building these types of applications.
+> Use only if specifically building these types. Otherwise use Sections 18/18.5.
 
-### Gaming / Multiplayer (~1%)
+### Niche Stack Matrix
+| Type | Framework | Stack Specialized | Deploy |
+|------|-----------|-------------------|--------|
+| **Gaming/Multiplayer** | Phaser/Three.js | Colyseus/WebSocket, 60fps game loop | AWS/Azure |
+| **IoT/Smart Home** | Next.js | TimescaleDB/InfluxDB + MQTT | AWS IoT/Azure |
+| **Healthcare/MedTech** | Next.js | Encrypted Postgres + HIPAA/BAA | AWS (BAA vendors) |
 
-| Type | Framework | Backend | Specialized | Deploy |
-|------|-----------|---------|-------------|--------|
-| Browser Game (.io style) | Phaser.js/PixiJS | Colyseus/Socket.io | Game server, tick rate 60fps | AWS/Azure |
-| Casual Web Game | Three.js/Babylon.js | Node.js + WebSocket | Leaderboards, matchmaking | Vercel/AWS |
-| Multiplayer Real-time | Phaser | Colyseus | State sync, interpolation | AWS GameLift |
-
-**Gaming-specific patterns:**
-- **Game loop:** requestAnimationFrame, delta time calculation
-- **State sync:** Server-authoritative (prevent cheating), snapshot interpolation
-- **Prediction:** Client-side prediction for responsiveness
-- **Matchmaking:** Redis queues, skill-based rating
-- **Tools:** Phaser (2D), Three.js/Babylon.js (3D), Colyseus (game server)
-
----
-
-### IoT / Smart Home (~0.5%)
-
-| Type | Framework | Database | Specialized | Deploy |
-|------|-----------|----------|-------------|--------|
-| Smart Home Dashboard | Next.js | TimescaleDB + InfluxDB | MQTT, telemetry graphs | AWS IoT Core |
-| Device Management | React | Postgres + Redis | MQTT protocol, OTA updates | Azure IoT Hub |
-| Industrial Monitoring | Next.js | TimescaleDB | Real-time metrics, alerts | Self-hosted |
-
-**IoT-specific patterns:**
-- **Protocols:** MQTT (lightweight), CoAP (constrained devices), WebSockets (dashboard)
-- **Time-series data:** TimescaleDB, InfluxDB for sensor data
-- **Message brokers:** Mosquitto, HiveMQ, AWS IoT Core, Azure IoT Hub
-- **OTA updates:** Over-the-air firmware updates, rollbacks
-- **Edge computing:** Process data close to devices (AWS IoT Greengrass)
-
----
-
-### Healthcare / MedTech (~0.5%)
-
-| Type | Framework | Database | Specialized | Deploy |
-|------|-----------|----------|-------------|--------|
-| EHR / Telemedicine | Next.js | Encrypted Postgres | HIPAA, BAA, audit logs | AWS (us-east-1) |
-| Medical Imaging | Next.js | S3 + CloudFront | DICOM viewers, CORS | Vercel Enterprise |
-| Patient Portal | Next.js | Postgres | HIPAA, 2FA, data retention | Vercel (BAA required) |
-
-**Healthcare-specific requirements:**
-- **Compliance:** HIPAA (US), GDPR (EU), HITECH Act
-- **Legal:** BAA (Business Associate Agreement) with ALL vendors
-- **Data residency:** Specific regions (us-east-1 for US healthcare data)
-- **Encryption:** At rest (database) + in transit (TLS 1.3)
-- **Audit trails:** Full access logging, who accessed what data when
-- **Disaster recovery:** 99.99% uptime, backups, geo-redundancy
-- **Vetted vendors:** Vercel Enterprise, AWS (with BAA), Google Cloud (with BAA)
-
-**Warning:** Never build healthcare apps without legal counsel and proper BAA agreements.
-
----
-
-### When to Use These Niche Stacks
-
-**Use Gaming stack if:**
-- Building browser games or multiplayer experiences
-- Need real-time game loop (60fps), not just real-time data
-- State synchronization with conflict resolution
-
-**Use IoT stack if:**
-- Building dashboards for connected devices
-- Need MQTT or time-series databases for sensor data
-- Device management, OTA updates required
-
-**Use Healthcare stack if:**
-- Building regulated medical applications (EHR, telemedicine)
-- Handling PHI (Protected Health Information)
-- Required to be HIPAA compliant
-
-**Otherwise:** Use standard scenarios from Sections 18 and 18.5.
+**Key Notes:**
+- Gaming: Server-authoritative state sync, client-side prediction
+- IoT: Time-series databases, MQTT protocol, OTA updates
+- Healthcare: HIPAA compliance, BAA required, audit trails, encrypted at rest + transit
 
 ---
 
@@ -1113,138 +843,70 @@ Memory leak? → Check closures, event listeners, cache size
 
 ## 23. REAL-TIME FEATURES
 
-### When to Use Real-time
-- Live chat/messaging
-- Collaborative editing (Google Docs style)
-- Live dashboards/analytics
-- Multiplayer features
-- Live notifications
+### When to Use
+Live chat/messaging, collaborative editing, live dashboards, multiplayer, notifications
 
-### Tech Stack Options
+### Tech Stack
 - **WebSockets:** Full-duplex, low latency, stateful (Socket.io, ws)
-- **Server-Sent Events (SSE):** Simple, server-to-client only, auto-reconnect
-- **WebRTC:** P2P, video/audio, data channels (LiveKit, SimplePeer)
-- **Polling:** Fallback, simple, higher latency
+- **SSE:** Simple, server-to-client only, auto-reconnect
+- **WebRTC:** P2P, video/audio (LiveKit, SimplePeer)
+- **Polling:** Fallback, higher latency
 
-### Real-time Architecture
+### Architecture
 ```
-Client ←→ WebSocket Server ←→ Redis (Pub/Sub) ←→ Application Server
-                                         ↓
-                                   Message Queue
+Client ←→ WebSocket Server ←→ Redis (Pub/Sub) ←→ Application Server → Message Queue
 ```
 
-### Tools & Platforms
-- **Socket.io:** Feature-rich, fallbacks to polling
-- **Pusher:** Managed service, quick integration
-- **LiveKit:** WebRTC, video/audio, SFU
-- **Ably:** Managed pub/sub, message queues
-- **Supabase Realtime:** Postgres changes, WebSocket, presence
+### Tools
+Socket.io, Pusher (managed), LiveKit (WebRTC), Ably (pub/sub), Supabase Realtime
 
 ---
 
 ## 24. AI/ML INTEGRATION PATTERNS
 
-### Common AI Features
-- Text generation (LLMs: GPT, Claude, local models)
-- Image generation (DALL-E, Stable Diffusion)
-- Embeddings + Vector search (semantic search)
-- Classification, sentiment analysis
-- Speech-to-text, text-to-speech
+### Common Features
+Text generation (LLMs), image generation, embeddings + vector search, classification, speech-to-text
 
-### Architecture Patterns
+### Architecture
 ```
-Client → API Gateway → AI Service → External AI API (OpenAI, Anthropic)
-                              ↓
-                         Vector DB (Pinecone, pgvector, Supabase)
-                              ↓
-                         Cache (Redis)
+Client → API Gateway → AI Service → External AI API → Vector DB (Pinecone, pgvector) → Cache (Redis)
 ```
 
 ### Best Practices
-- **Async processing:** AI requests are slow, use background jobs
-- **Streaming:** Stream responses for better UX (Server-Sent Events)
-- **Caching:** Cache embeddings, common queries
-- **Fallback:** Have fallback models/providers
-- **Cost monitoring:** AI APIs are expensive, track usage
+Async processing (background jobs), streaming responses, cache embeddings, fallback models, cost monitoring
 
-### Vector Database Options
-- **PostgreSQL + pgvector:** No extra infrastructure
-- **Pinecone:** Managed, scalable, expensive
-- **Supabase Vector:** Postgres + pgvector, managed
-- **Weaviate:** Open source, GraphQL API
-- **Qdrant:** Open source, performance-optimized
+### Vector DBs
+PostgreSQL + pgvector (no extra infra), Pinecone (managed), Supabase Vector, Weaviate, Qdrant
 
 ---
 
 ## 25. INTERNATIONALIZATION (i18n)
 
-### When to Add i18n
-- Targeting multiple countries/regions
-- Legal requirement (some jurisdictions)
-- User base speaks different languages
+### When to Add
+Targeting multiple countries/regions, legal requirement, multilingual user base
 
-### i18n Checklist
-- [ ] UI text extraction (no hardcoded strings)
-- [ ] Date/time formatting (locale-aware)
-- [ ] Number/currency formatting
-- [ ] Text direction (LTR/RTL for Arabic, Hebrew)
-- [ ] Pluralization rules (different per language)
-- [ ] Image/text replacement (culturally dependent)
+### Checklist
+UI text extraction, date/time formatting (locale-aware), number/currency formatting, LTR/RTL support, pluralization rules, culturally dependent images/text
 
 ### Frameworks
-- **next-intl:** Next.js, type-safe, SSG support
-- **react-i18next:** React ecosystem, widely used
-- **vue-i18n:** Vue ecosystem
-- **svelte-i18n:** Svelte ecosystem
-- **formatjs:** ICU message format, pluralization
-
-### Architecture
-```
-locales/              (e.g., en, fr, es, zh)
-  ├── en/
-  │   ├── common.json     (shared translations)
-  │   ├── home.json
-  │   └── auth.json
-  ├── fr/
-  │   ├── common.json
-  │   ├── home.json
-  │   └── auth.json
-  └── ...
-```
+next-intl (Next.js), react-i18next, vue-i18n, svelte-i18n, formatjs (ICU message format)
 
 ### Best Practices
-- Use ICU message format for complex messages
-- Support text interpolation (variables in strings)
-- Handle missing translations gracefully (fallback to English)
-- Consider timezone handling (date-fns-tz, luxon, Intl API)
+ICU message format, text interpolation, graceful fallback (English), timezone handling (date-fns-tz, luxon, Intl API)
 
 ---
 
 ## 26. ACCESSIBILITY (WCAG 2.1 AA)
 
 ### Non-Negotiable Checklist
-- [ ] **Keyboard Navigation:** All interactive elements accessible via Tab
-- [ ] **Focus Indicators:** Visible focus state on all interactive elements
-- [ ] **Color Contrast:** 4.5:1 for text, 3:1 for UI components (AA level)
-- [ ] **Alt Text:** Descriptive alt text for all images
-- [ ] **Form Labels:** Explicit labels (not just placeholder text)
-- [ ] **Error Messages:** Visible, understandable, associated with input
-- [ ] **Semantic HTML:** Use proper elements (nav, main, article, button)
-- [ ] **ARIA Labels:** Use when semantic HTML insufficient
-- [ ] **Screen Reader Testing:** Test with NVDA, JAWS, or VoiceOver
-- [ ] **Resize Support:** 200% zoom must be functional (no horizontal scroll)
+- [ ] Keyboard Navigation (Tab accessible), Focus Indicators, Color Contrast (4.5:1 text, 3:1 UI)
+- [ ] Alt Text for images, Explicit Form Labels, Associated Error Messages
+- [ ] Semantic HTML (nav, main, article, button), ARIA Labels when needed
+- [ ] Screen Reader Testing (NVDA, JAWS, VoiceOver), 200% zoom support
 
 ### Tools
-- **axe DevTools:** Browser extension for automated testing
-- **WAVE:** WebAIM evaluation tool
-- **Lighthouse:** Accessibility audit in Chrome DevTools
-- **playwright-ally:** E2E a11y testing
-- **@axe-core/react:** Automated React a11y testing
-
-### Color Contrast Tools
-- **WebAIM Contrast Checker:** Quick validation
-- **Contrast Ratio:** macOS app
-- **Chroma.js:** Color manipulation in code
+- **Testing:** axe DevTools, WAVE, Lighthouse, playwright-ally, @axe-core/react
+- **Color Contrast:** WebAIM Contrast Checker, Contrast Ratio (macOS), Chroma.js
 
 ---
 
@@ -1252,71 +914,42 @@ locales/              (e.g., en, fr, es, zh)
 
 ### Logging Strategy
 ```javascript
-// Structured logging (JSON)
-logger.info('user_action', {
-  event: 'purchase_completed',
-  user_id: '123',
-  amount: 99.99,
-  currency: 'USD',
-  correlation_id: 'abc-123'
-})
+logger.info('user_action', { event: 'purchase_completed', user_id: '123', amount: 99.99 })
 ```
 
-### Metrics to Track
-- **RED Method:** Rate (requests/sec), Errors (error rate), Duration (response time)
-- **Business Metrics:** DAU/MAU, conversion rate, feature usage
+### Metrics
+- **RED Method:** Rate (req/sec), Errors (error rate), Duration (response time)
+- **Business:** DAU/MAU, conversion rate, feature usage
 - **Infrastructure:** CPU, memory, disk, network
 
-### Error Tracking
-- **Sentry:** Open source, free tier, stack traces, releases
-- **Rollbar:** Similar to Sentry, better UX
-- **Bugsnag:** Simple, good for small teams
+### Tools
+- **Error Tracking:** Sentry (open source, free tier), Rollbar, Bugsnag
+- **APM:** Vercel Analytics, New Relic, DataDog, Grafana + Prometheus
 
-### APM (Application Performance Monitoring)
-- **Vercel Analytics:** Next.js optimized, Web Vitals
-- **New Relic:** Full-stack APM, expensive
-- **DataDog:** Infrastructure + APM, enterprise
-- **Grafana:** Open source, self-hosted, Prometheus
-
-### Alerting Best Practices
-- Alert on symptoms, not causes (e.g., "high error rate" not "high CPU")
-- Use SLO-based alerting (error budget)
-- Avoid alert fatigue (mean time to alert > mean time to detect)
-- Include runbooks in alerts (what to do)
+### Alerting
+Alert on symptoms not causes, use SLO-based alerting, avoid alert fatigue, include runbooks
 
 ---
 
 ## 28. COST OPTIMIZATION
 
-### Database Costs
-- **Connection pooling:** Reduce open connections
-- **Read replicas:** Offload read queries
-- **Caching:** Reduce database hits
-- **Archival:** Move old data to cold storage (S3, Glacier)
+### Database
+Connection pooling, read replicas, caching, archival to cold storage (S3, Glacier)
 
-### CDN Costs
-- **Cache headers:** Maximize cache hit ratio
-- **Image optimization:** Serve WebP/AVIF, lazy loading
-- **Bundle size:** Reduce JavaScript transfer
+### CDN
+Maximize cache headers, image optimization (WebP/AVIF, lazy loading), reduce bundle size
 
-### AI API Costs
-- **Caching:** Cache responses for similar queries
-- **Smaller models:** Use fine-tuned smaller models when possible
-- **Batching:** Combine multiple requests
-- **Rate limiting:** Prevent abuse
+### AI APIs
+Cache responses, smaller fine-tuned models, batching, rate limiting
 
 ### Cloud Infrastructure
-- **Right-sizing:** Don't overprovision
-- **Reserved instances:** For predictable workloads
-- **Spot instances:** For fault-tolerant workloads
-- **Serverless:** Pay only when used (Cold start trade-off)
+Right-sizing, reserved instances (predictable), spot instances (fault-tolerant), serverless (pay-per-use)
 
 ---
 
 ## 29. DOCUMENTATION BEST PRACTICES
 
 ### Documentation Hierarchy
-
 ```
 project/
 ├── README.md              # Project overview, quick start
@@ -1331,183 +964,7 @@ project/
     └── *.ts/*.tsx         # Inline comments
 ```
 
-### README.md Structure
-
-```markdown
-# Project Name
-
-> One-line description of what this project does
-
-## Quick Start
-
-\`\`\`bash
-npm install
-npm run dev
-\`\`\`
-
-## Features
-
-- Feature 1
-- Feature 2
-- Feature 3
-
-## Tech Stack
-
-- Next.js 15
-- TypeScript
-- Tailwind CSS
-- Supabase
-
-## Project Structure
-
-\`\`\`
-src/
-├── app/          # Next.js app directory
-├── components/   # Reusable components
-├── lib/          # Utility functions
-└── styles/       # Global styles
-\`\`\`
-
-## Development
-
-\`\`\`bash
-npm run dev          # Start dev server
-npm run build        # Build for production
-npm run test         # Run tests
-npm run lint         # Run linter
-\`\`\`
-
-## Deployment
-
-[Link to deployment guide](./docs/deployment.md)
-
-## Contributing
-
-[Link to contributing guide](./CONTRIBUTING.md)
-
-## License
-
-MIT
-```
-
-### API Documentation
-
-#### Using OpenAPI/Swagger
-
-```yaml
-# openapi.yaml
-openapi: 3.0.0
-info:
-  title: My API
-  version: 1.0.0
-paths:
-  /users:
-    get:
-      summary: List users
-      parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-components:
-  schemas:
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-        email:
-          type: string
-```
-
-### Code Documentation Standards
-
-#### TypeScript JSDoc
-
-```typescript
-/**
- * Calculates the total price including tax
- *
- * @param price - Base price in USD
- * @param taxRate - Tax rate as decimal (e.g., 0.1 for 10%)
- * @param discount - Optional discount amount
- * @returns Total price including tax
- *
- * @example
- * ```ts
- * calculateTotal(100, 0.1, 10) // Returns 100
- * ```
- *
- * @throws {Error} If price is negative
- */
-export function calculateTotal(
-  price: number,
-  taxRate: number,
-  discount?: number
-): number {
-  if (price < 0) {
-    throw new Error('Price cannot be negative')
-  }
-  const subtotal = price - (discount || 0)
-  return subtotal * (1 + taxRate)
-}
-```
-
-#### Component Documentation
-
-```typescript
-/**
- * UserProfile Component
- *
- * Displays user profile information with avatar and details.
- *
- * @remarks
- * This component fetches user data from the server using the provided userId.
- * It shows a loading state while data is being fetched.
- *
- * @example
- * ```tsx
- * <UserProfile userId="123" showEmail={true} />
- * ```
- */
-export function UserProfile({
-  userId,
-  showEmail = false,
-}: UserProfileProps) {
-  // Component implementation
-}
-```
-
-### Architecture Decision Records (ADRs)
-
-```markdown
-# ADR-001: Choose PostgreSQL as Primary Database
-
-## Status
-Accepted
-
-## Context
-We need a database for our application. Options: PostgreSQL, MySQL, MongoDB.
-
-## Decision
-Use PostgreSQL as the primary database.
-
-## Consequences
-- Positive: ACID compliance, JSONB support, excellent tooling
-- Negative: Vertical scaling limits (mitigated by read replicas)
-```
-
 ### When to Document
-
 | Scenario | Documentation Type |
 |----------|-------------------|
 | New project | README.md with quick start |
@@ -1519,7 +976,6 @@ Use PostgreSQL as the primary database.
 | Breaking change | Update CHANGELOG.md |
 
 ### Documentation Tools
-
 - **Swagger/OpenAPI:** API documentation
 - **TypeDoc:** TypeScript documentation generator
 - **Docusaurus/VitePress:** Documentation sites
@@ -1527,4 +983,3 @@ Use PostgreSQL as the primary database.
 - **Mermaid:** Diagrams (architecture, flowcharts)
 
 ---
-
