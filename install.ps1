@@ -365,7 +365,7 @@ $claudeJsonContent | Out-File -FilePath $claudeJsonPath -Encoding utf8 -Force
 Write-Host "[OK] .claude.json cree avec MCP servers" -ForegroundColor Green
 # Download CLAUDE.md from GitHub
 $claudeMdPath = Join-Path $claudyDir "CLAUDE.md"
-$claudeMdUrl = "https://raw.githubusercontent.com/uglyswap/Claudy/main/CLAUDE.md"
+$claudeMdUrl = "https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/CLAUDE.md"
 try {
     Invoke-WebRequest -Uri $claudeMdUrl -OutFile $claudeMdPath -UseBasicParsing
     Write-Host "[OK] System prompt AKHITHINK installe" -ForegroundColor Magenta

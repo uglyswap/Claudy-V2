@@ -316,7 +316,7 @@ echo -e "${GREEN}[OK] .claude.json cree avec MCP servers${NC}"
 # ============================================
 echo -e "${YELLOW}Installation du system prompt...${NC}"
 CLAUDE_MD_PATH="$CLAUDY_DIR/CLAUDE.md"
-CLAUDE_MD_URL="https://raw.githubusercontent.com/uglyswap/Claudy/main/CLAUDE.md"
+CLAUDE_MD_URL="https://raw.githubusercontent.com/uglyswap/Claudy-V2/main/CLAUDE.md"
 if curl -fsSL "$CLAUDE_MD_URL" -o "$CLAUDE_MD_PATH" 2>/dev/null; then
     echo -e "${MAGENTA}[OK] System prompt AKHITHINK installe${NC}"
     echo -e "${MAGENTA}[OK] Identite Claudy Focan configuree${NC}"
