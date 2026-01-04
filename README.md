@@ -120,7 +120,7 @@ Choisissez la version **LTS** (recommandée).
 
 ### Étape 2 : Obtenir une clé API Z.AI
 
-1. Allez sur **https://open.zai.cloud/**
+1. Allez sur **[https://z.ai/subscribe/](https://z.ai/subscribe?ic=ZPF27VSKQV)**
 2. Créez un compte ou connectez-vous
 3. Allez dans la gestion des clés API
 4. Créez une nouvelle clé et copiez-la
